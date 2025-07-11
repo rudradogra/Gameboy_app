@@ -11,8 +11,22 @@ class GameboyDpad extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          Container(width: 20, height: 60, color: Colors.black54, borderRadius: BorderRadius.circular(8)),
-          Container(width: 60, height: 20, color: Colors.black54, borderRadius: BorderRadius.circular(8)),
+          Container(
+            width: 20,
+            height: 60,
+            decoration: BoxDecoration(
+              color: Colors.black54,
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          Container(
+            width: 60,
+            height: 20,
+            decoration: BoxDecoration(
+              color: Colors.black54,
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
           Container(width: 28, height: 28, decoration: BoxDecoration(color: Colors.black87, shape: BoxShape.circle)),
         ],
       ),

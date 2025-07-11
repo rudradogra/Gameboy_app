@@ -54,9 +54,19 @@ class HomePage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    // GAME BOY COLOR logo
                     const SizedBox(height: 8),
-                    const GameboyLogo(),
+Text(
+  'Ash Ketchum, 21\nPokemon Trainer • Pallet Town',
+  textAlign: TextAlign.center,
+  style: TextStyle(
+    fontFamily: 'monospace',
+    fontSize: 14,
+    color: Colors.cyanAccent,
+    height: 1.4,
+    fontWeight: FontWeight.w600,
+  ),
+),
+
                     // Spacer for button area
                     const SizedBox(height: 18),
                     Expanded(
