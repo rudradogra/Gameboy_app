@@ -1,1 +1,9 @@
 flutter/ephemeral
+build/
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+.macos/
+.idea/
+*.iml
