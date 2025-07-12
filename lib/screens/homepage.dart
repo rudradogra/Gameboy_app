@@ -52,8 +52,22 @@ class _HomePageState extends State<HomePage> {
     } else if (direction == 'center') {
       // Edit profile when center is pressed
       _editProfile();
+    } else if (direction == 'up') {
+      // Superlike when up is pressed
+      _handleSuperlike();
     }
     print('D-pad pressed: $direction');
+  }
+
+  void _handleSuperlike() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Superliked ${profiles[currentProfileIndex]['name']}! 💖✨'),
+        backgroundColor: Colors.purple,
+        duration: Duration(seconds: 1),
+      ),
+    );
+    _nextProfile();
   }
 
   void _handleLike() {
@@ -247,6 +261,7 @@ class _HomePageState extends State<HomePage> {
                                 'B': 'Pass on profile',
                                 'START': 'Logout',
                                 'SELECT': 'Show controls (this popup)',
+                                '↑': 'Superlike profile',
                               });
                             },
                           ),
