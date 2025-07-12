@@ -1,6 +1,6 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const { supabase } = require('../config/supabase');
+const { supabase, supabaseAdmin } = require('../config/supabase');
 const authenticateToken = require('../middleware/auth');
 
 const router = express.Router();
@@ -29,7 +29,7 @@ router.post('/', authenticateToken, [
     }
 
     // Check if already interacted with this user
-    const { data: existingMatch } = await supabase
+    const { data: existingMatch } = await supabaseAdmin
       .from('matches')
       .select('*')
       .eq('user1_id', req.user.id)
@@ -50,7 +50,7 @@ router.post('/', authenticateToken, [
       created_at: new Date().toISOString()
     };
 
-    const { data: newMatch, error } = await supabase
+    const { data: newMatch, error } = await supabaseAdmin
       .from('matches')
       .insert(matchData)
       .select()
@@ -68,7 +68,7 @@ router.post('/', authenticateToken, [
     let mutualMatch = null;
 
     if (action === 'like' || action === 'superlike') {
-      const { data: reverseMatch } = await supabase
+      const { data: reverseMatch } = await supabaseAdmin
         .from('matches')
         .select('*')
         .eq('user1_id', target_user_id)
@@ -80,7 +80,7 @@ router.post('/', authenticateToken, [
         isMatch = true;
         
         // Update both matches to indicate they're mutual
-        await supabase
+        await supabaseAdmin
           .from('matches')
           .update({ 
             is_mutual: true,
@@ -88,7 +88,7 @@ router.post('/', authenticateToken, [
           })
           .eq('id', newMatch.id);
 
-        await supabase
+        await supabaseAdmin
           .from('matches')
           .update({ 
             is_mutual: true,
@@ -186,7 +186,7 @@ router.get('/me', authenticateToken, async (req, res) => {
 // Get mutual matches only
 router.get('/mutual', authenticateToken, async (req, res) => {
   try {
-    const { data: matches, error } = await supabase
+    const { data: matches, error } = await supabaseAdmin
       .from('matches')
       .select(`
         *,
@@ -241,7 +241,7 @@ router.delete('/:matchId', authenticateToken, async (req, res) => {
     const { matchId } = req.params;
 
     // First, verify the user is part of this match
-    const { data: match, error: fetchError } = await supabase
+    const { data: match, error: fetchError } = await supabaseAdmin
       .from('matches')
       .select('*')
       .eq('id', matchId)
@@ -255,7 +255,7 @@ router.delete('/:matchId', authenticateToken, async (req, res) => {
     }
 
     // Delete the match
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('matches')
       .delete()
       .eq('id', matchId);

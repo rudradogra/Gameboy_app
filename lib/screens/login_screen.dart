@@ -7,6 +7,7 @@ import '../widgets/gameboy_speaker_dots.dart';
 import '../widgets/gameboy_logo.dart';
 import '../widgets/gameboy_controls_popup.dart';
 import '../widgets/gameboy_action_popup.dart';
+import '../services/api_service.dart';
 import 'register_screen.dart';
 import 'homepage.dart';
 
@@ -20,11 +21,12 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   int selectedField =
       0; // 0: username, 1: password, 2: login button, 3: register link
-  String username = '';
+  String email = '';
   String password = '';
   bool showPassword = false;
+  bool isLoading = false;
 
-  final List<String> menuItems = ['Username', 'Password', 'Login', 'Register'];
+  final List<String> menuItems = ['Email', 'Password', 'Login', 'Register'];
 
   void _handleDpadNavigation(String direction) {
     setState(() {
@@ -46,10 +48,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _handleAButton() {
     switch (selectedField) {
-      case 0: // Username field
-        _showInputDialog('Username', username, (value) {
+      case 0: // Email field
+        _showInputDialog('Email', email, (value) {
           setState(() {
-            username = value;
+            email = value;
           });
         });
         break;
@@ -173,31 +175,78 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _performLogin() {
-    if (username.isNotEmpty && password.isNotEmpty) {
-      // Simple validation - in real app, use proper authentication
-      GameboyActionPopup.show(
-        context,
-        title: 'Success',
-        message: 'Login Successful!',
-        backgroundColor: Colors.green,
-        icon: Icons.check_circle,
-      );
-
-      // Navigate to HomePage after successful login
-      Future.delayed(Duration(milliseconds: 800), () {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-        );
+  void _performLogin() async {
+    if (email.isNotEmpty && password.isNotEmpty) {
+      setState(() {
+        isLoading = true;
       });
+
+      try {
+        print('🚀 Attempting login with email: $email');
+        final result = await ApiService.login(email: email, password: password);
+
+        print('📥 Login API response: $result');
+
+        setState(() {
+          isLoading = false;
+        });
+
+        if (result['success']) {
+          print('✅ Login successful!');
+          // Show success message
+          GameboyActionPopup.show(
+            context,
+            'Success',
+            message: 'Login Successful!',
+            backgroundColor: Colors.green,
+            icon: Icons.check_circle,
+            duration: Duration(seconds: 1),
+          );
+
+          // Navigate to HomePage after successful login
+          Future.delayed(Duration(milliseconds: 800), () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+            );
+          });
+        } else {
+          print('❌ Login failed: ${result['message']}');
+          print('🔍 Full error response: $result');
+          // Show error message
+          GameboyActionPopup.show(
+            context,
+            'Login Failed',
+            message: result['message'] ?? 'Unknown error occurred',
+            duration: Duration(seconds: 1),
+            backgroundColor: Colors.red,
+            icon: Icons.error,
+          );
+        }
+      } catch (e) {
+        print('💥 Login exception caught: $e');
+        print('🔍 Exception type: ${e.runtimeType}');
+        setState(() {
+          isLoading = false;
+        });
+
+        GameboyActionPopup.show(
+          context,
+          'Network Error',
+          message: 'Unable to connect to server: $e',
+          backgroundColor: Colors.red,
+          icon: Icons.wifi_off,
+          duration: Duration(seconds: 1),
+        );
+      }
     } else {
       GameboyActionPopup.show(
         context,
-        title: 'Error',
+        'Error',
         message: 'Please fill in all fields',
         backgroundColor: Colors.red,
         icon: Icons.error,
+        duration: Duration(seconds: 1),
       );
     }
   }
@@ -219,7 +268,28 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           SizedBox(height: 16),
 
-          // Username field
+          if (isLoading) ...[
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Connecting...',
+              style: TextStyle(
+                color: Colors.black54,
+                fontSize: 8,
+                fontFamily: 'PublicPixel',
+              ),
+            ),
+            SizedBox(height: 16),
+          ],
+
+          // Email field
           Container(
             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
@@ -234,13 +304,13 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             child: Row(
               children: [
-                Icon(Icons.person, color: Colors.black, size: 18),
+                Icon(Icons.email, color: Colors.black, size: 18),
                 SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    username.isEmpty ? 'Username' : username,
+                    email.isEmpty ? 'Email' : email,
                     style: TextStyle(
-                      color: username.isEmpty ? Colors.grey[600] : Colors.black,
+                      color: email.isEmpty ? Colors.grey[600] : Colors.black,
                       fontFamily: 'PublicPixel',
                       fontSize: 10, // Reduced from 12
                     ),

@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
-const { supabase } = require('../config/supabase');
+const { supabase, supabaseAdmin } = require('../config/supabase');
 
 const router = express.Router();
 
@@ -42,8 +42,8 @@ router.post('/register', registerValidation, async (req, res) => {
 
     const { email, password, username, name } = req.body;
 
-    // Check if user already exists
-    const { data: existingUser } = await supabase
+    // Check if user already exists (use admin client to bypass RLS)
+    const { data: existingUser } = await supabaseAdmin
       .from('users')
       .select('email, username')
       .or(`email.eq.${email},username.eq.${username}`)
@@ -60,8 +60,8 @@ router.post('/register', registerValidation, async (req, res) => {
     const saltRounds = 12;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // Create user in Supabase
-    const { data: user, error } = await supabase
+    // Create user in Supabase (use admin client to bypass RLS)
+    const { data: user, error } = await supabaseAdmin
       .from('users')
       .insert({
         email,
@@ -116,8 +116,8 @@ router.post('/login', loginValidation, async (req, res) => {
 
     const { email, password } = req.body;
 
-    // Get user from database
-    const { data: user, error } = await supabase
+    // Get user from database (use admin client to bypass RLS)
+    const { data: user, error } = await supabaseAdmin
       .from('users')
       .select('*')
       .eq('email', email)
@@ -139,8 +139,8 @@ router.post('/login', loginValidation, async (req, res) => {
       });
     }
 
-    // Update last login
-    await supabase
+    // Update last login (use admin client to bypass RLS)
+    await supabaseAdmin
       .from('users')
       .update({ last_login: new Date().toISOString() })
       .eq('id', user.id);
@@ -181,7 +181,7 @@ router.get('/verify', async (req, res) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
-    const { data: user, error } = await supabase
+    const { data: user, error } = await supabaseAdmin
       .from('users')
       .select('id, email, username, name, created_at, last_login')
       .eq('id', decoded.userId)

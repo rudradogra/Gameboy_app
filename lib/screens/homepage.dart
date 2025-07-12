@@ -80,7 +80,7 @@ class _HomePageState extends State<HomePage> {
   void _handleSuperlike() {
     GameboyActionPopup.show(
       context,
-      title: 'SUPERLIKE!',
+      'SUPERLIKE!',
       message: '${profiles[currentProfileIndex]['name']}\nSUPERLIKED!',
       backgroundColor: Colors.amber,
       icon: Icons.star,
@@ -92,7 +92,7 @@ class _HomePageState extends State<HomePage> {
   void _handleLike() {
     GameboyActionPopup.show(
       context,
-      title: 'LIKED!',
+      'LIKED!',
       message: '${profiles[currentProfileIndex]['name']}\nLIKED!',
       backgroundColor: Colors.green,
       icon: Icons.favorite,
@@ -104,7 +104,7 @@ class _HomePageState extends State<HomePage> {
   void _handlePass() {
     GameboyActionPopup.show(
       context,
-      title: 'PASSED',
+      'PASSED',
       message: '${profiles[currentProfileIndex]['name']}\nPASSED',
       backgroundColor: Colors.redAccent,
       icon: Icons.close,

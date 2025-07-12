@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
-const { supabase } = require('../config/supabase');
+const { supabase, supabaseAdmin } = require('../config/supabase');
 const authenticateToken = require('../middleware/auth');
 
 const router = express.Router();
@@ -38,7 +38,7 @@ router.post('/image', authenticateToken, upload.single('image'), async (req, res
     const fileName = `${req.user.id}/${uuidv4()}${fileExtension}`;
 
     // Upload to Supabase Storage
-    const { data, error } = await supabase.storage
+    const { data, error } = await supabaseAdmin.storage
       .from('profile-images')
       .upload(fileName, req.file.buffer, {
         contentType: req.file.mimetype,
@@ -92,7 +92,7 @@ router.post('/images', authenticateToken, upload.array('images', 6), async (req,
       const fileExtension = path.extname(file.originalname);
       const fileName = `${req.user.id}/${uuidv4()}${fileExtension}`;
 
-      const { data, error } = await supabase.storage
+      const { data, error } = await supabaseAdmin.storage
         .from('profile-images')
         .upload(fileName, file.buffer, {
           contentType: file.mimetype,
@@ -148,7 +148,7 @@ router.delete('/image', authenticateToken, async (req, res) => {
       });
     }
 
-    const { error } = await supabase.storage
+    const { error } = await supabaseAdmin.storage
       .from('profile-images')
       .remove([file_path]);
 
@@ -175,7 +175,7 @@ router.delete('/image', authenticateToken, async (req, res) => {
 // Get user's uploaded images
 router.get('/images/me', authenticateToken, async (req, res) => {
   try {
-    const { data, error } = await supabase.storage
+    const { data, error } = await supabaseAdmin.storage
       .from('profile-images')
       .list(req.user.id, {
         limit: 100,

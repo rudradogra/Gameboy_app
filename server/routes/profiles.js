@@ -1,6 +1,6 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const { supabase } = require('../config/supabase');
+const { supabase, supabaseAdmin } = require('../config/supabase');
 const authenticateToken = require('../middleware/auth');
 
 const router = express.Router();
@@ -13,7 +13,7 @@ router.get('/discover', authenticateToken, async (req, res) => {
     const offset = (page - 1) * limit;
 
     // Get profiles that the current user hasn't interacted with yet
-    const { data: profiles, error } = await supabase
+    const { data: profiles, error } = await supabaseAdmin
       .from('profiles')
       .select(`
         *,
@@ -31,7 +31,7 @@ router.get('/discover', authenticateToken, async (req, res) => {
     }
 
     // Filter out profiles that user has already liked/passed
-    const { data: interactions } = await supabase
+    const { data: interactions } = await supabaseAdmin
       .from('matches')
       .select('user2_id')
       .eq('user1_id', req.user.id);
@@ -57,7 +57,7 @@ router.get('/discover', authenticateToken, async (req, res) => {
 // Get current user's profile
 router.get('/me', authenticateToken, async (req, res) => {
   try {
-    const { data: profile, error } = await supabase
+    const { data: profile, error } = await supabaseAdmin
       .from('profiles')
       .select('*')
       .eq('user_id', req.user.id)
@@ -120,7 +120,7 @@ router.post('/me', authenticateToken, [
     };
 
     // Check if profile exists
-    const { data: existingProfile } = await supabase
+    const { data: existingProfile } = await supabaseAdmin
       .from('profiles')
       .select('id')
       .eq('user_id', req.user.id)
@@ -129,7 +129,7 @@ router.post('/me', authenticateToken, [
     let result;
     if (existingProfile) {
       // Update existing profile
-      result = await supabase
+      result = await supabaseAdmin
         .from('profiles')
         .update(profileData)
         .eq('user_id', req.user.id)
@@ -138,7 +138,7 @@ router.post('/me', authenticateToken, [
     } else {
       // Create new profile
       profileData.created_at = new Date().toISOString();
-      result = await supabase
+      result = await supabaseAdmin
         .from('profiles')
         .insert(profileData)
         .select()
@@ -170,7 +170,7 @@ router.get('/:profileId', authenticateToken, async (req, res) => {
   try {
     const { profileId } = req.params;
 
-    const { data: profile, error } = await supabase
+    const { data: profile, error } = await supabaseAdmin
       .from('profiles')
       .select(`
         *,
@@ -208,7 +208,7 @@ router.get('/:profileId', authenticateToken, async (req, res) => {
 // Deactivate profile
 router.delete('/me', authenticateToken, async (req, res) => {
   try {
-    const { data: profile, error } = await supabase
+    const { data: profile, error } = await supabaseAdmin
       .from('profiles')
       .update({ 
         is_active: false,

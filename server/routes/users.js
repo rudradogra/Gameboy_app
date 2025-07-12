@@ -1,6 +1,6 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const { supabase } = require('../config/supabase');
+const { supabase, supabaseAdmin } = require('../config/supabase');
 const authenticateToken = require('../middleware/auth');
 
 const router = express.Router();
@@ -8,7 +8,7 @@ const router = express.Router();
 // Get user profile
 router.get('/me', authenticateToken, async (req, res) => {
   try {
-    const { data: user, error } = await supabase
+    const { data: user, error } = await supabaseAdmin
       .from('users')
       .select('id, email, username, name, created_at, last_login')
       .eq('id', req.user.id)
@@ -52,7 +52,7 @@ router.put('/me', authenticateToken, [
     if (name !== undefined) updateData.name = name;
     if (username !== undefined) {
       // Check if username is already taken
-      const { data: existingUser } = await supabase
+      const { data: existingUser } = await supabaseAdmin
         .from('users')
         .select('id')
         .eq('username', username)
@@ -75,7 +75,7 @@ router.put('/me', authenticateToken, [
 
     updateData.updated_at = new Date().toISOString();
 
-    const { data: user, error } = await supabase
+    const { data: user, error } = await supabaseAdmin
       .from('users')
       .update(updateData)
       .eq('id', req.user.id)
@@ -106,19 +106,19 @@ router.put('/me', authenticateToken, [
 router.delete('/me', authenticateToken, async (req, res) => {
   try {
     // Delete user's profile first (if exists)
-    await supabase
+    await supabaseAdmin
       .from('profiles')
       .delete()
       .eq('user_id', req.user.id);
 
     // Delete user's matches
-    await supabase
+    await supabaseAdmin
       .from('matches')
       .delete()
       .or(`user1_id.eq.${req.user.id},user2_id.eq.${req.user.id}`);
 
     // Delete user account
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('users')
       .delete()
       .eq('id', req.user.id);

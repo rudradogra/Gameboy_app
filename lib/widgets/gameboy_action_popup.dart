@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 class GameboyActionPopup {
   static void show(
-    BuildContext context, {
-    required String title,
+    BuildContext context,
+    String title, {
     required String message,
     required Color backgroundColor,
     required IconData icon,
