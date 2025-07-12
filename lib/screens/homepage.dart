@@ -6,12 +6,112 @@ import '../widgets/gameboy_pill_button.dart';
 import '../widgets/gameboy_speaker_dots.dart';
 import '../widgets/gameboy_logo.dart';
 import '../widgets/gameboy_profile_card.dart';
+import 'login_screen.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int currentProfileIndex = 0;
+
+  final List<Map<String, dynamic>> profiles = [
+    {
+      'imageUrl':
+          'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
+      'name': 'Rudra Dogra',
+      'age': 19,
+      'info': ['Software Developer', 'From Delhi', 'Loves coding and gaming!'],
+    },
+    {
+      'imageUrl':
+          'https://images.unsplash.com/photo-1494790108755-2616c0763b13?w=400&h=400&fit=crop&crop=face',
+      'name': 'Sarah Chen',
+      'age': 22,
+      'info': ['Graphic Designer', 'From Tokyo', 'Art and coffee enthusiast'],
+    },
+    {
+      'imageUrl':
+          'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face',
+      'name': 'Alex Rodriguez',
+      'age': 25,
+      'info': ['Photographer', 'From Barcelona', 'Adventure seeker'],
+    },
+  ];
+
+  void _handleDpadNavigation(String direction) {
+    // D-pad can be used for additional navigation if needed
+    print('D-pad pressed: $direction');
+  }
+
+  void _handleLike() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Liked ${profiles[currentProfileIndex]['name']}! 💖'),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 1),
+      ),
+    );
+    _nextProfile();
+  }
+
+  void _handlePass() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Passed on ${profiles[currentProfileIndex]['name']}'),
+        backgroundColor: Colors.orange,
+        duration: Duration(seconds: 1),
+      ),
+    );
+    _nextProfile();
+  }
+
+  void _nextProfile() {
+    setState(() {
+      currentProfileIndex = (currentProfileIndex + 1) % profiles.length;
+    });
+  }
+
+  void _logout() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Color(0xFF8B0000),
+        title: Text(
+          'Logout',
+          style: TextStyle(color: Colors.white, fontFamily: 'monospace'),
+        ),
+        content: Text(
+          'Are you sure you want to logout?',
+          style: TextStyle(color: Colors.white70, fontFamily: 'monospace'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel', style: TextStyle(color: Colors.white70)),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+              );
+            },
+            child: Text('Logout', style: TextStyle(color: Colors.cyanAccent)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final currentProfile = profiles[currentProfileIndex];
+
     return Scaffold(
       backgroundColor: const Color(0xFF181818),
       body: Center(
@@ -34,7 +134,10 @@ class HomePage extends StatelessWidget {
                 // Main column for vertical layout
                 Column(
                   children: [
-                    const SizedBox(height: 28),
+                    const SizedBox(height: 20),
+                    // GameBoy Logo
+                    const GameboyLogo(),
+                    const SizedBox(height: 16),
                     // Gameboy Screen with thick bezel
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 28.0),
@@ -42,32 +145,14 @@ class HomePage extends StatelessWidget {
                         aspectRatio: 1.1, // Slightly wider for realism
                         child: GameboyScreen(
                           child: GameboyProfileCard(
-                            imageUrl: 'https://randomuser.me/api/portraits/men/1.jpg',
-                            name: 'Ash Ketchum',
-                            age: 21,
-                            info: [
-                              'Pokemon Trainer',
-                              'From Pallet Town',
-                              'Wants to be the very best!',
-                            ],
+                            imageUrl: currentProfile['imageUrl'],
+                            name: currentProfile['name'],
+                            age: currentProfile['age'],
+                            info: List<String>.from(currentProfile['info']),
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 8),
-Text(
-  'Ash Ketchum, 21\nPokemon Trainer • Pallet Town',
-  textAlign: TextAlign.center,
-  style: TextStyle(
-    fontFamily: 'monospace',
-    fontSize: 14,
-    color: Colors.cyanAccent,
-    height: 1.4,
-    fontWeight: FontWeight.w600,
-  ),
-),
-
-                    // Spacer for button area
                     const SizedBox(height: 18),
                     Expanded(
                       child: Row(
@@ -75,20 +160,46 @@ Text(
                         children: [
                           // D-pad
                           Padding(
-                            padding: const EdgeInsets.only(left: 32.0, top: 16.0),
-                            child: GameboyDpad(),
+                            padding: const EdgeInsets.only(
+                              left: 32.0,
+                              top: 16.0,
+                            ),
+                            child: GameboyDpad(
+                              onDirectionPressed: _handleDpadNavigation,
+                            ),
                           ),
                           const Spacer(),
-                          // A/B buttons (B lower than A)
+                          // A/B buttons (diagonal layout)
                           Padding(
-                            padding: const EdgeInsets.only(right: 38.0, top: 8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: const [
-                                GameboyButton(label: 'A'),
-                                SizedBox(height: 24),
-                                GameboyButton(label: 'B'),
-                              ],
+                            padding: const EdgeInsets.only(
+                              right: 20.0,
+                              top: 8.0,
+                            ),
+                            child: SizedBox(
+                              width: 100,
+                              height: 80,
+                              child: Stack(
+                                children: [
+                                  // B button (bottom-left)
+                                  Positioned(
+                                    left: 0,
+                                    top: 30,
+                                    child: GameboyButton(
+                                      label: 'B',
+                                      onPressed: _handlePass,
+                                    ),
+                                  ),
+                                  // A button (top-right)
+                                  Positioned(
+                                    right: 0,
+                                    top: 0,
+                                    child: GameboyButton(
+                                      label: 'A',
+                                      onPressed: _handleLike,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -99,10 +210,16 @@ Text(
                       padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          GameboyPillButton(label: 'SELECT'),
-                          SizedBox(width: 24),
-                          GameboyPillButton(label: 'START'),
+                        children: [
+                          GameboyPillButton(
+                            label: 'SELECT',
+                            onPressed: _logout,
+                          ),
+                          const SizedBox(width: 24),
+                          GameboyPillButton(
+                            label: 'START',
+                            onPressed: _nextProfile,
+                          ),
                         ],
                       ),
                     ),
@@ -123,4 +240,4 @@ Text(
       ),
     );
   }
-} 
+}

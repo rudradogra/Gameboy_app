@@ -12,62 +12,66 @@ class GameboyProfileCard extends StatelessWidget {
     required this.name,
     required this.age,
     required this.info,
-  }) : assert(info.length == 3), super(key: key);
+  }) : assert(info.length == 3),
+       super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF231616),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(16),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Profile Image
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.network(
-              imageUrl,
-              height: 80,
-              width: 80,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
-                height: 80,
-                width: 80,
-                color: Colors.grey[800],
-                child: Icon(Icons.person, color: Colors.white38, size: 40),
+          // Profile Image with rounded corners
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                imageUrl,
+                height: 140,
+                width: 140,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  height: 140,
+                  width: 140,
+                  color: Colors.grey[300],
+                  child: Icon(Icons.person, color: Colors.grey[600], size: 60),
+                ),
               ),
             ),
           ),
-          const SizedBox(height: 8),
-          // Name and Age
-          Text(
-            '$name, $age',
-            style: const TextStyle(
-              color: Colors.white,
-              fontFamily: 'monospace',
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
+          const SizedBox(height: 16),
+          // Name and age in black text box style
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.8),
+              borderRadius: BorderRadius.circular(8),
             ),
-          ),
-          const SizedBox(height: 8),
-          // Info lines
-          ...info.map((line) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: 2.0),
             child: Text(
-              line,
-              style: const TextStyle(
-                color: Colors.white70,
-                fontFamily: 'monospace',
-                fontSize: 14,
-              ),
+              '$name, $age',
               textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white,
+                fontFamily: 'monospace',
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
             ),
-          )),
+          ),
         ],
       ),
     );
   }
-} 
+}

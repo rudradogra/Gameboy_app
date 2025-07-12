@@ -5,20 +5,22 @@ class GameboySpeakerDots extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Column(
       mainAxisSize: MainAxisSize.min,
-      children: List.generate(3, (i) =>
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 2.0),
-          child: Column(
+      children: List.generate(
+        6,
+        (i) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 3.0),
+          child: Row(
             mainAxisSize: MainAxisSize.min,
-            children: List.generate(2, (j) =>
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2.0),
+            children: List.generate(
+              4,
+              (j) => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 3.0),
                 child: Container(
-                  width: 6,
-                  height: 6,
-                  decoration: BoxDecoration(
+                  width: 4,
+                  height: 4,
+                  decoration: const BoxDecoration(
                     color: Colors.black54,
                     shape: BoxShape.circle,
                   ),
@@ -30,4 +32,4 @@ class GameboySpeakerDots extends StatelessWidget {
       ),
     );
   }
-} 
+}

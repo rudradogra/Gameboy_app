@@ -1,35 +1,90 @@
 import 'package:flutter/material.dart';
 
 class GameboyDpad extends StatelessWidget {
-  const GameboyDpad({Key? key}) : super(key: key);
+  final Function(String)? onDirectionPressed;
+
+  const GameboyDpad({Key? key, this.onDirectionPressed}) : super(key: key);
+
+  Widget _buildDirectionButton(
+    String direction,
+    Alignment alignment,
+    IconData icon,
+  ) {
+    return Positioned.fill(
+      child: Align(
+        alignment: alignment,
+        child: GestureDetector(
+          onTap: () => onDirectionPressed?.call(direction),
+          child: Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: Colors.black87,
+              borderRadius: BorderRadius.circular(4),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black45,
+                  blurRadius: 2,
+                  offset: Offset(1, 1),
+                ),
+                BoxShadow(
+                  color: Colors.white24,
+                  blurRadius: 1,
+                  offset: Offset(-0.5, -0.5),
+                ),
+              ],
+            ),
+            child: Icon(icon, color: Colors.white70, size: 16),
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 60,
-      height: 60,
+      width: 80,
+      height: 80,
       child: Stack(
-        alignment: Alignment.center,
         children: [
-          Container(
-            width: 20,
-            height: 60,
-            decoration: BoxDecoration(
-              color: Colors.black54,
-              borderRadius: BorderRadius.circular(8),
+          // Up button
+          _buildDirectionButton(
+            'up',
+            Alignment.topCenter,
+            Icons.keyboard_arrow_up,
+          ),
+          // Down button
+          _buildDirectionButton(
+            'down',
+            Alignment.bottomCenter,
+            Icons.keyboard_arrow_down,
+          ),
+          // Left button
+          _buildDirectionButton(
+            'left',
+            Alignment.centerLeft,
+            Icons.keyboard_arrow_left,
+          ),
+          // Right button
+          _buildDirectionButton(
+            'right',
+            Alignment.centerRight,
+            Icons.keyboard_arrow_right,
+          ),
+          // Center (invisible but functional)
+          Center(
+            child: GestureDetector(
+              onTap: () => onDirectionPressed?.call('center'),
+              child: Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(color: Colors.transparent),
+              ),
             ),
           ),
-          Container(
-            width: 60,
-            height: 20,
-            decoration: BoxDecoration(
-              color: Colors.black54,
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          Container(width: 28, height: 28, decoration: BoxDecoration(color: Colors.black87, shape: BoxShape.circle)),
         ],
       ),
     );
   }
-} 
+}
