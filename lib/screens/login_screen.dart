@@ -5,6 +5,8 @@ import '../widgets/gameboy_button.dart';
 import '../widgets/gameboy_pill_button.dart';
 import '../widgets/gameboy_speaker_dots.dart';
 import '../widgets/gameboy_logo.dart';
+import '../widgets/gameboy_controls_popup.dart';
+import '../widgets/gameboy_power_button.dart';
 import 'register_screen.dart';
 import 'homepage.dart';
 
@@ -299,16 +301,35 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                // GameBoy Logo
-                const GameboyLogo(),
+                // Screen and Power button row
+                Row(
+                  children: [
+                    // Power button (left of screen)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 24.0, top: 30.0),
+                      child: GameboyPowerButton(
+                        isActive: false, // Inactive on login screen
+                        onPressed: null,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    // GameBoy Screen
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 28.0),
+                        child: AspectRatio(
+                          aspectRatio: 1.1,
+                          child: GameboyScreen(child: _buildLoginForm()),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 16),
-                // GameBoy Screen
+                // GameBoy Logo in black border container
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 28.0),
-                  child: AspectRatio(
-                    aspectRatio: 1.1,
-                    child: GameboyScreen(child: _buildLoginForm()),
-                  ),
+                  child: const GameboyLogo(),
                 ),
                 const SizedBox(height: 18),
                 // Controls section
@@ -316,9 +337,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const SizedBox(width: 20),
                       // D-pad
                       Padding(
-                        padding: const EdgeInsets.only(left: 32.0, top: 16.0),
+                        padding: const EdgeInsets.only(left: 16.0, top: 16.0),
                         child: GameboyDpad(
                           onDirectionPressed: _handleDpadNavigation,
                         ),
@@ -326,21 +348,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       const Spacer(),
                       // A/B buttons (diagonal layout)
                       Padding(
-                        padding: const EdgeInsets.only(right: 20.0, top: 8.0),
+                        padding: const EdgeInsets.only(right: 32.0, top: 8.0),
                         child: SizedBox(
                           width: 120,
                           height: 100,
                           child: Stack(
                             children: [
-                              // B button (bottom-left)
+                              // B button (bottom-left) - Inactive on login screen
                               Positioned(
                                 left: 0,
                                 top: 50,
                                 child: GameboyButton(
                                   label: 'B',
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
+                                  onPressed: null, // Inactive
                                 ),
                               ),
                               // A button (top-right)
@@ -368,8 +388,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       GameboyPillButton(
                         label: 'SELECT',
                         onPressed: () {
-                          setState(() {
-                            showPassword = !showPassword;
+                          // Show controls popup
+                          GameboyControlsPopup.show(context, {
+                            '↑ ↓': 'Navigate menu items',
+                            '← →': 'Not used',
+                            'CENTER': 'Not used',
+                            'A': 'Select/Login',
+                            'B': 'Disabled (grayed out)',
+                            'START': 'Login',
+                            'SELECT': 'Show controls (this popup)',
                           });
                         },
                       ),

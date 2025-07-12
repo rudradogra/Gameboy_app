@@ -9,15 +9,17 @@ class GameboyButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isEnabled = onPressed != null;
+    
     return GestureDetector(
       onTap: onPressed,
       child: Container(
         width: 50,
         height: 50,
         decoration: BoxDecoration(
-          color: Colors.black87,
+          color: isEnabled ? Colors.black87 : Colors.grey[600],
           shape: BoxShape.circle,
-          boxShadow: [
+          boxShadow: isEnabled ? [
             BoxShadow(
               color: Colors.black54,
               blurRadius: 6,
@@ -28,13 +30,19 @@ class GameboyButton extends StatelessWidget {
               blurRadius: 2,
               offset: Offset(-1, -1),
             ),
+          ] : [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 3,
+              offset: Offset(1, 1),
+            ),
           ],
         ),
         child: Center(
           child: Text(
             label,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: isEnabled ? Colors.white : Colors.grey[400],
               fontWeight: FontWeight.bold,
               fontSize: 22,
               fontFamily: 'monospace',

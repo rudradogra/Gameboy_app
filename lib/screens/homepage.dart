@@ -6,6 +6,8 @@ import '../widgets/gameboy_pill_button.dart';
 import '../widgets/gameboy_speaker_dots.dart';
 import '../widgets/gameboy_logo.dart';
 import '../widgets/gameboy_profile_card.dart';
+import '../widgets/gameboy_controls_popup.dart';
+import '../widgets/gameboy_power_button.dart';
 import 'login_screen.dart';
 import 'edit_profile_screen.dart';
 
@@ -151,33 +153,51 @@ class _HomePageState extends State<HomePage> {
                 Column(
                   children: [
                     const SizedBox(height: 20),
-                    // GameBoy Logo
-                    const GameboyLogo(),
-                    const SizedBox(height: 16),
-                    // Gameboy Screen with thick bezel
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 16.0),
-                        child: GameboyScreen(
-                          child: GameboyProfileCard(
-                            key: _profileCardKey,
-                            imageUrl: currentProfile['imageUrl'],
-                            name: currentProfile['name'],
-                            age: currentProfile['age'],
-                            info: List<String>.from(currentProfile['info']),
+                    // Screen and Power button row
+                    Row(
+                      children: [
+                        // Power button (left of screen) - active for logout
+                        Padding(
+                          padding: const EdgeInsets.only(left: 24.0, top: 30.0),
+                          child: GameboyPowerButton(
+                            isActive: true,
+                            onPressed: _logout,
                           ),
                         ),
-                      ),
+                        const SizedBox(width: 8),
+                        // Gameboy Screen
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 28.0, top: 16.0, bottom: 16.0),
+                            child: GameboyScreen(
+                              child: GameboyProfileCard(
+                                key: _profileCardKey,
+                                imageUrl: currentProfile['imageUrl'],
+                                name: currentProfile['name'],
+                                age: currentProfile['age'],
+                                info: List<String>.from(currentProfile['info']),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    // GameBoy Logo in black border container
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                      child: const GameboyLogo(),
                     ),
                     const SizedBox(height: 10),
                     Expanded(
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          const SizedBox(width: 20),
                           // D-pad
                           Padding(
                             padding: const EdgeInsets.only(
-                              left: 32.0,
+                              left: 16.0,
                               top: 16.0,
                             ),
                             child: GameboyDpad(
@@ -188,7 +208,7 @@ class _HomePageState extends State<HomePage> {
                           // A/B buttons (diagonal layout)
                           Padding(
                             padding: const EdgeInsets.only(
-                              right: 20.0,
+                              right: 32.0,
                               top: 8.0,
                             ),
                             child: SizedBox(
@@ -229,12 +249,24 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           GameboyPillButton(
                             label: 'SELECT',
-                            onPressed: _editProfile,
+                            onPressed: () {
+                              // Show controls popup
+                              GameboyControlsPopup.show(context, {
+                                '↑ ↓': 'Not used',
+                                '← →': 'Not used', 
+                                'CENTER': 'Not used',
+                                '↓': 'Toggle profile info',
+                                'A': 'Like profile',
+                                'B': 'Pass on profile',
+                                'START': 'Edit your profile',
+                                'SELECT': 'Show controls (this popup)',
+                              });
+                            },
                           ),
                           const SizedBox(width: 24),
                           GameboyPillButton(
                             label: 'START',
-                            onPressed: _logout,
+                            onPressed: _editProfile,
                           ),
                         ],
                       ),

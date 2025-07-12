@@ -16,15 +16,15 @@ class GameboyDpad extends StatelessWidget {
         child: GestureDetector(
           onTap: () => onDirectionPressed?.call(direction),
           child: Container(
-            width: 28,
-            height: 28,
+            width: 35,
+            height: 35,
             decoration: BoxDecoration(
               color: Colors.black87,
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(6),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black45,
-                  blurRadius: 2,
+                  blurRadius: 3,
                   offset: Offset(1, 1),
                 ),
                 BoxShadow(
@@ -34,7 +34,7 @@ class GameboyDpad extends StatelessWidget {
                 ),
               ],
             ),
-            child: Icon(icon, color: Colors.white70, size: 16),
+            child: Icon(icon, color: Colors.white70, size: 20),
           ),
         ),
       ),
@@ -44,8 +44,8 @@ class GameboyDpad extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 80,
-      height: 80,
+      width: 100,
+      height: 100,
       child: Stack(
         children: [
           // Up button
