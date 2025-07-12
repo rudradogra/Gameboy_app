@@ -176,14 +176,14 @@ class _HomePageState extends State<HomePage> {
                               top: 8.0,
                             ),
                             child: SizedBox(
-                              width: 100,
-                              height: 80,
+                              width: 120,
+                              height: 100,
                               child: Stack(
                                 children: [
                                   // B button (bottom-left)
                                   Positioned(
                                     left: 0,
-                                    top: 30,
+                                    top: 50,
                                     child: GameboyButton(
                                       label: 'B',
                                       onPressed: _handlePass,
