@@ -200,15 +200,22 @@ class _LoginScreenState extends State<LoginScreen> {
             message: 'Login Successful!',
             backgroundColor: Colors.green,
             icon: Icons.check_circle,
-            duration: Duration(seconds: 1),
+            duration: Duration(milliseconds: 800),
           );
 
           // Navigate to HomePage after successful login
-          Future.delayed(Duration(milliseconds: 800), () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const HomePage()),
-            );
+          Future.delayed(Duration(milliseconds: 900), () {
+            print('🧭 Navigating to HomePage...');
+            if (mounted) {
+              print('✅ Widget is mounted, proceeding with navigation');
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+                (route) => false, // Remove all previous routes
+              );
+            } else {
+              print('❌ Widget is not mounted, skipping navigation');
+            }
           });
         } else {
           print('❌ Login failed: ${result['message']}');
@@ -266,27 +273,18 @@ class _LoginScreenState extends State<LoginScreen> {
               fontFamily: 'PublicPixel',
             ),
           ),
-          SizedBox(height: 16),
+          SizedBox(height: isLoading ? 8 : 16), // Reduced height when loading
 
           if (isLoading) ...[
-            SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
-              ),
-            ),
-            SizedBox(height: 8),
             Text(
               'Connecting...',
               style: TextStyle(
                 color: Colors.black54,
-                fontSize: 8,
+                fontSize: 6, // Reduced from 8
                 fontFamily: 'PublicPixel',
               ),
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 8), // Reduced from 16
           ],
 
           // Email field
@@ -320,8 +318,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          SizedBox(height: 10),
-
+          SizedBox(height: 8), // Reduced from 10
           // Password field
           Container(
             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -352,8 +349,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          SizedBox(height: 12),
-
+          SizedBox(height: 10), // Reduced from 12
           // Login button
           Container(
             width: double.infinity,
@@ -369,23 +365,22 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             child: Text(
-              'LOGIN',
+              isLoading ? 'CONNECTING...' : 'LOGIN', // Show loading state
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: selectedField == 2 ? Colors.black : Colors.white,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'PublicPixel',
-                fontSize: 12, // Reduced from 14
+                fontSize: 10, // Reduced from 12
               ),
             ),
           ),
 
-          // SizedBox(height: 8),
-
+          SizedBox(height: 4), // Reduced spacing
           // Register link
           Container(
             width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 6),
+            padding: EdgeInsets.symmetric(vertical: 4), // Reduced from 6
             decoration: BoxDecoration(
               color: selectedField == 3
                   ? Colors.yellow.withOpacity(0.3)
@@ -402,7 +397,7 @@ class _LoginScreenState extends State<LoginScreen> {
               style: TextStyle(
                 color: Colors.black87,
                 fontFamily: 'PublicPixel',
-                fontSize: 8, // Reduced from 10
+                fontSize: 7, // Reduced from 8
                 decoration: TextDecoration.underline,
               ),
             ),

@@ -210,11 +210,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
             );
 
             // Navigate to HomePage after successful registration
-            Future.delayed(Duration(milliseconds: 800), () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
-              );
+            Future.delayed(Duration(milliseconds: 900), () {
+              if (mounted) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HomePage()),
+                  (route) => false, // Remove all previous routes
+                );
+              }
             });
           } else {
             print('❌ Registration failed: ${result['message']}');

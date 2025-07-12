@@ -122,6 +122,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _logout() {
+    print('🚪 Logout function called');
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -178,6 +179,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    print('🏠 HomePage build method called');
     final currentProfile = profiles[currentProfileIndex];
 
     return Scaffold(
