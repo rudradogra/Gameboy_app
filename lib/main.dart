@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'screens/login_screen.dart';
+import 'services/gameboy_sound.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize the GameBoy sound system
+  await GameBoySound.initialize();
+
   runApp(const MyApp());
 }
 

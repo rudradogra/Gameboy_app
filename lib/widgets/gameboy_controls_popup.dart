@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/gameboy_sound.dart';
 
 class GameboyControlsPopup {
   static void show(BuildContext context, Map<String, String> controls) {
@@ -110,35 +111,109 @@ class GameboyControlsPopup {
 
                 const SizedBox(height: 16),
 
-                // Close button
-                GestureDetector(
-                  onTap: () => Navigator.of(context).pop(),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.cyanAccent,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.3),
-                          blurRadius: 4,
-                          offset: Offset(2, 2),
+                // Action buttons row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // Sound toggle button
+                    GestureDetector(
+                      onTap: () {
+                        GameBoySound.toggleSound();
+                        // Show a brief feedback
+                        Navigator.of(context).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              GameBoySound.isSoundEnabled
+                                  ? 'Sound ON'
+                                  : 'Sound OFF',
+                              style: TextStyle(
+                                fontFamily: 'PublicPixel',
+                                fontSize: 8,
+                              ),
+                            ),
+                            duration: Duration(milliseconds: 800),
+                            backgroundColor: const Color(0xFF8B0000),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
                         ),
-                      ],
-                    ),
-                    child: Text(
-                      'CLOSE',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'PublicPixel',
+                        decoration: BoxDecoration(
+                          color: GameBoySound.isSoundEnabled
+                              ? Colors.green
+                              : Colors.grey[400],
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 4,
+                              offset: Offset(2, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              GameBoySound.isSoundEnabled
+                                  ? Icons.volume_up
+                                  : Icons.volume_off,
+                              color: Colors.black,
+                              size: 14,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              GameBoySound.isSoundEnabled ? 'ON' : 'OFF',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 8,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'PublicPixel',
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
+
+                    // Close button
+                    GestureDetector(
+                      onTap: () {
+                        GameBoySound.playButtonClick();
+                        Navigator.of(context).pop();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.cyanAccent,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 4,
+                              offset: Offset(2, 2),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          'CLOSE',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'PublicPixel',
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

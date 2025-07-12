@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'grainy_texture.dart';
+import '../services/gameboy_sound.dart';
 
 class GameboyDpad extends StatelessWidget {
   final Function(String)? onDirectionPressed;
@@ -15,7 +16,10 @@ class GameboyDpad extends StatelessWidget {
       child: Align(
         alignment: alignment,
         child: GestureDetector(
-          onTap: () => onDirectionPressed?.call(direction),
+          onTap: () {
+            GameBoySound.playNavigation();
+            onDirectionPressed?.call(direction);
+          },
           child: GrainyContainer(
             color: Colors.black87,
             borderRadius: BorderRadius.circular(6),

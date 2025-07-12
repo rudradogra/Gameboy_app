@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'grainy_texture.dart';
+import '../services/gameboy_sound.dart';
 
 class GameboyPillButton extends StatelessWidget {
   final String label;
@@ -11,7 +12,12 @@ class GameboyPillButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onPressed,
+      onTap: onPressed != null
+          ? () {
+              GameBoySound.playButtonClick();
+              onPressed!();
+            }
+          : null,
       child: GrainyContainer(
         color: Colors.grey[300]!,
         borderRadius: BorderRadius.circular(25),

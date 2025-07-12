@@ -8,6 +8,7 @@ import '../widgets/gameboy_logo.dart';
 import '../widgets/gameboy_controls_popup.dart';
 import '../widgets/gameboy_action_popup.dart';
 import '../services/api_service.dart';
+import '../services/gameboy_sound.dart';
 import 'login_screen.dart';
 import 'homepage.dart';
 
@@ -200,6 +201,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
           if (result['success']) {
             print('✅ Registration successful!');
+            // Play success sound
+            GameBoySound.playSuccess();
+
             // Show success message
             GameboyActionPopup.show(
               context,
@@ -222,6 +226,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           } else {
             print('❌ Registration failed: ${result['message']}');
             print('🔍 Full error response: $result');
+            // Play error sound
+            GameBoySound.playError();
+
             // Show error message
             GameboyActionPopup.show(
               context,
@@ -238,6 +245,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             isLoading = false;
           });
 
+          // Play error sound
+          GameBoySound.playError();
+
           GameboyActionPopup.show(
             context,
             'Network Error',
@@ -247,6 +257,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           );
         }
       } else {
+        // Play error sound for password mismatch
+        GameBoySound.playError();
+
         GameboyActionPopup.show(
           context,
           'Error',
@@ -256,6 +269,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         );
       }
     } else {
+      // Play error sound for missing fields
+      GameBoySound.playError();
+
       GameboyActionPopup.show(
         context,
         'Error',

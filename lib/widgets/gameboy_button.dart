@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'grainy_texture.dart';
+import '../services/gameboy_sound.dart';
 
 class GameboyButton extends StatelessWidget {
   final String label;
@@ -13,7 +14,12 @@ class GameboyButton extends StatelessWidget {
     final bool isEnabled = onPressed != null;
 
     return GestureDetector(
-      onTap: onPressed,
+      onTap: onPressed != null
+          ? () {
+              GameBoySound.playButtonClick();
+              onPressed!();
+            }
+          : null,
       child: GrainyContainer(
         color: isEnabled ? Colors.black87 : Colors.grey[600]!,
         borderRadius: BorderRadius.circular(25), // Circular shape
