@@ -5,6 +5,8 @@ class GameboyProfileCard extends StatefulWidget {
   final String name;
   final int age;
   final List<String> info;
+  final int currentImageIndex;
+  final bool showInfo;
 
   const GameboyProfileCard({
     Key? key,
@@ -12,6 +14,8 @@ class GameboyProfileCard extends StatefulWidget {
     required this.name,
     required this.age,
     required this.info,
+    required this.currentImageIndex,
+    required this.showInfo,
   }) : assert(info.length == 3),
        super(key: key);
 
@@ -21,24 +25,8 @@ class GameboyProfileCard extends StatefulWidget {
 
 class GameboyProfileCardState extends State<GameboyProfileCard>
     with SingleTickerProviderStateMixin {
-  bool _showInfo = false;
   late AnimationController _animationController;
   late Animation<double> _animation;
-  int _currentImageIndex = 0;
-
-  void handleDirection(String direction) {
-    setState(() {
-      if (direction == 'left') {
-        _currentImageIndex = (_currentImageIndex - 1) % widget.imageUrl.length;
-      } else if (direction == 'right') {
-        _currentImageIndex = (_currentImageIndex + 1) % widget.imageUrl.length;
-      }
-      // Ensure index is not negative
-      if (_currentImageIndex < 0) {
-        _currentImageIndex = widget.imageUrl.length - 1;
-      }
-    });
-  }
 
   @override
   void initState() {
@@ -50,23 +38,33 @@ class GameboyProfileCardState extends State<GameboyProfileCard>
     _animation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
+
+    // Set initial animation state based on showInfo
+    if (widget.showInfo) {
+      _animationController.value = 1.0;
+    } else {
+      _animationController.value = 0.0;
+    }
+  }
+
+  @override
+  void didUpdateWidget(GameboyProfileCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Update animation when showInfo changes
+    if (oldWidget.showInfo != widget.showInfo) {
+      if (widget.showInfo) {
+        _animationController.forward();
+      } else {
+        _animationController.reverse();
+      }
+    }
   }
 
   @override
   void dispose() {
     _animationController.dispose();
     super.dispose();
-  }
-
-  void toggleInfo() {
-    setState(() {
-      _showInfo = !_showInfo;
-      if (_showInfo) {
-        _animationController.forward();
-      } else {
-        _animationController.reverse();
-      }
-    });
   }
 
   @override
@@ -78,7 +76,7 @@ class GameboyProfileCardState extends State<GameboyProfileCard>
         ClipRRect(
           borderRadius: BorderRadius.circular(12),
           child: Image.network(
-            widget.imageUrl[_currentImageIndex],
+            widget.imageUrl[widget.currentImageIndex],
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) => Container(
               color: Colors.grey[300],
@@ -147,10 +145,10 @@ class GameboyProfileCardState extends State<GameboyProfileCard>
                   borderRadius: BorderRadius.only(
                     bottomLeft: const Radius.circular(12),
                     bottomRight: const Radius.circular(12),
-                    topLeft: _showInfo
+                    topLeft: widget.showInfo
                         ? const Radius.circular(0)
                         : const Radius.circular(12),
-                    topRight: _showInfo
+                    topRight: widget.showInfo
                         ? const Radius.circular(0)
                         : const Radius.circular(12),
                   ),

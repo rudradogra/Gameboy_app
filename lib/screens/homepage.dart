@@ -21,7 +21,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int currentProfileIndex = 0;
-  final GlobalKey<GameboyProfileCardState> _profileCardKey = GlobalKey();
+  int currentImageIndex = 0;
+  bool showProfileInfo = false;
 
   final List<Map<String, dynamic>> profiles = [
     {
@@ -47,20 +48,33 @@ class _HomePageState extends State<HomePage> {
   ];
 
   void _handleDpadNavigation(String direction) {
-    if (direction == 'down') {
-      // Toggle the profile info when down is pressed
-      _profileCardKey.currentState?.toggleInfo();
-    } else if (direction == 'center') {
-      // Edit profile when center is pressed
+    setState(() {
+      if (direction == 'down') {
+        // Toggle info when down is pressed
+        showProfileInfo = !showProfileInfo;
+      } else if (direction == 'center') {
+        // Edit profile when center is pressed (Note: this doesn't call setState since it's a navigation)
+      } else if (direction == 'up') {
+        // Superlike when up is pressed (Note: this doesn't call setState since it shows popup)
+      } else if (direction == 'left') {
+        // Navigate to previous image
+        final currentProfile = profiles[currentProfileIndex];
+        final imageCount = (currentProfile['imageUrls'] as List).length;
+        currentImageIndex = (currentImageIndex - 1 + imageCount) % imageCount;
+      } else if (direction == 'right') {
+        // Navigate to next image
+        final currentProfile = profiles[currentProfileIndex];
+        final imageCount = (currentProfile['imageUrls'] as List).length;
+        currentImageIndex = (currentImageIndex + 1) % imageCount;
+      }
+    });
+
+    // Handle actions that don't need setState
+    if (direction == 'center') {
       _editProfile();
     } else if (direction == 'up') {
-      // Superlike when up is pressed
       _handleSuperlike();
-    } else if (direction == 'left' || direction == 'right') {
-      // Forward left/right to profile card for image navigation
-      _profileCardKey.currentState?.handleDirection(direction);
     }
-    print('D-pad pressed: $direction');
   }
 
   void _handleSuperlike() {
@@ -102,6 +116,8 @@ class _HomePageState extends State<HomePage> {
   void _nextProfile() {
     setState(() {
       currentProfileIndex = (currentProfileIndex + 1) % profiles.length;
+      currentImageIndex = 0; // Reset image index for new profile
+      showProfileInfo = false; // Reset info state for new profile
     });
   }
 
@@ -196,11 +212,15 @@ class _HomePageState extends State<HomePage> {
                           aspectRatio: 1.1,
                           child: GameboyScreen(
                             child: GameboyProfileCard(
-                              key: _profileCardKey,
+                              key: ValueKey(
+                                'profile_${currentProfileIndex}_${currentImageIndex}_$showProfileInfo',
+                              ),
                               imageUrl: currentProfile['imageUrls'],
                               name: currentProfile['name'],
                               age: currentProfile['age'],
                               info: List<String>.from(currentProfile['info']),
+                              currentImageIndex: currentImageIndex,
+                              showInfo: showProfileInfo,
                             ),
                           ),
                         ),

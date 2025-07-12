@@ -41,7 +41,7 @@ class GameboyControlsPopup {
                         'GAMEBOY CONTROLS',
                         style: TextStyle(
                           color: Colors.cyanAccent,
-                          fontSize: 14,
+                          fontSize: 11,
                           fontWeight: FontWeight.bold,
                           fontFamily: 'PublicPixel',
                         ),
@@ -67,7 +67,7 @@ class GameboyControlsPopup {
                         child: Row(
                           children: [
                             Container(
-                              width: 60,
+                              width: 80,
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 6,
                                 vertical: 2,
@@ -84,20 +84,20 @@ class GameboyControlsPopup {
                                 entry.key,
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 11,
+                                  fontSize: 8,
                                   fontWeight: FontWeight.bold,
                                   fontFamily: 'PublicPixel',
                                 ),
                                 textAlign: TextAlign.center,
                               ),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 15),
                             Expanded(
                               child: Text(
                                 entry.value,
                                 style: TextStyle(
                                   color: Colors.grey[300],
-                                  fontSize: 11,
+                                  fontSize: 8,
                                   fontFamily: 'PublicPixel',
                                 ),
                               ),
