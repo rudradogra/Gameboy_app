@@ -18,6 +18,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int currentProfileIndex = 0;
+  final GlobalKey<GameboyProfileCardState> _profileCardKey = GlobalKey();
 
   final List<Map<String, dynamic>> profiles = [
     {
@@ -44,7 +45,10 @@ class _HomePageState extends State<HomePage> {
   ];
 
   void _handleDpadNavigation(String direction) {
-    // D-pad can be used for additional navigation if needed
+    if (direction == 'down') {
+      // Toggle the profile info when down is pressed
+      _profileCardKey.currentState?.toggleInfo();
+    }
     print('D-pad pressed: $direction');
   }
 
@@ -156,6 +160,7 @@ class _HomePageState extends State<HomePage> {
                         padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 16.0),
                         child: GameboyScreen(
                           child: GameboyProfileCard(
+                            key: _profileCardKey,
                             imageUrl: currentProfile['imageUrl'],
                             name: currentProfile['name'],
                             age: currentProfile['age'],
