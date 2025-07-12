@@ -19,51 +19,6 @@ class GameboyLogo extends StatelessWidget {
             letterSpacing: 1.5,
           ),
         ),
-        Text(
-          'C',
-          style: TextStyle(
-            fontFamily: 'monospace',
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            color: Colors.cyanAccent,
-          ),
-        ),
-        Text(
-          'O',
-          style: TextStyle(
-            fontFamily: 'monospace',
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            color: Colors.pinkAccent,
-          ),
-        ),
-        Text(
-          'L',
-          style: TextStyle(
-            fontFamily: 'monospace',
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            color: Colors.yellowAccent,
-          ),
-        ),
-        Text(
-          'O',
-          style: TextStyle(
-            fontFamily: 'monospace',
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            color: Colors.greenAccent,
-          ),
-        ),
-        Text(
-          'R',
-          style: TextStyle(
-            fontFamily: 'monospace',
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            color: Colors.deepPurpleAccent,
-          ),
-        ),
       ],
     );
   }

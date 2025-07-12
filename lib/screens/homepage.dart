@@ -139,10 +139,9 @@ class _HomePageState extends State<HomePage> {
                     const GameboyLogo(),
                     const SizedBox(height: 16),
                     // Gameboy Screen with thick bezel
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 28.0),
-                      child: AspectRatio(
-                        aspectRatio: 1.1, // Slightly wider for realism
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 16.0),
                         child: GameboyScreen(
                           child: GameboyProfileCard(
                             imageUrl: currentProfile['imageUrl'],
@@ -153,7 +152,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 10),
                     Expanded(
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,

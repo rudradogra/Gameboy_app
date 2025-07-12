@@ -72,14 +72,30 @@ class GameboyDpad extends StatelessWidget {
             Alignment.centerRight,
             Icons.keyboard_arrow_right,
           ),
-          // Center (invisible but functional)
+          // Center button
           Center(
             child: GestureDetector(
               onTap: () => onDirectionPressed?.call('center'),
               child: Container(
-                width: 20,
-                height: 20,
-                decoration: BoxDecoration(color: Colors.transparent),
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: Colors.black87,
+                  borderRadius: BorderRadius.circular(4),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black45,
+                      blurRadius: 2,
+                      offset: Offset(1, 1),
+                    ),
+                    BoxShadow(
+                      color: Colors.white24,
+                      blurRadius: 1,
+                      offset: Offset(-0.5, -0.5),
+                    ),
+                  ],
+                ),
+                child: Icon(Icons.circle_outlined, color: Colors.white70, size: 16),
               ),
             ),
           ),

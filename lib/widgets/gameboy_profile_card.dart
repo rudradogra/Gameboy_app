@@ -17,61 +17,80 @@ class GameboyProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Profile Image with rounded corners
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
-                  blurRadius: 8,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                imageUrl,
-                height: 140,
-                width: 140,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  height: 140,
-                  width: 140,
-                  color: Colors.grey[300],
-                  child: Icon(Icons.person, color: Colors.grey[600], size: 60),
-                ),
-              ),
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        // Background Image
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.network(
+            imageUrl,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => Container(
+              color: Colors.grey[300],
+              child: Icon(Icons.person, color: Colors.grey[600], size: 60),
             ),
           ),
-          const SizedBox(height: 16),
-          // Name and age in black text box style
-          Container(
-            width: double.infinity,
+        ),
+        
+        // Retro Hearts in top right
+        Positioned(
+          top: 12,
+          right: 12,
+          child: Row(
+            children: List.generate(5, (index) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 2.0),
+                child: Icon(
+                  Icons.favorite,
+                  color: Colors.red,
+                  size: 20,
+                ),
+              );
+            }),
+          ),
+        ),
+        
+        // Gradient overlay at bottom for name
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: Container(
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.8),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(12),
+                bottomRight: Radius.circular(12),
+              ),
+              gradient: LinearGradient(
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+                colors: [
+                  Colors.black.withOpacity(0.8),
+                  Colors.transparent,
+                ],
+              ),
             ),
             child: Text(
               '$name, $age',
-              textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Colors.white,
                 fontFamily: 'monospace',
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
+                shadows: [
+                  Shadow(
+                    offset: Offset(1, 1),
+                    blurRadius: 2,
+                    color: Colors.black,
+                  ),
+                ],
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
