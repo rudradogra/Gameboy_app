@@ -10,17 +10,17 @@ class GameboyScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.black,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.black, width: 8),
+        border: Border.all(color: Colors.black, width: 16), // Increased border
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.4),
-            blurRadius: 6,
-            offset: Offset(0, 2),
+            blurRadius: 8,
+            offset: Offset(0, 3),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(10.0), // Increased padding
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -32,18 +32,23 @@ class GameboyScreen extends StatelessWidget {
               ],
             ),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Color(0xFFFF69B4), width: 3), // Hot pink border
+            border: Border.all(
+              color: Color(0xFFFF69B4),
+              width: 3,
+            ), // Hot pink border
           ),
-          child: child ?? Center(
-            child: Text(
-              'Profile Content',
-              style: TextStyle(
-                color: Colors.black,
-                fontFamily: 'monospace',
-                fontSize: 18,
+          child:
+              child ??
+              Center(
+                child: Text(
+                  'Profile Content',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontFamily: 'monospace',
+                    fontSize: 18,
+                  ),
+                ),
               ),
-            ),
-          ),
         ),
       ),
     );

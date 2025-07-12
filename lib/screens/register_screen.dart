@@ -340,29 +340,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                // Screen and Power button row
-                Row(
-                  children: [
-                    // Power button (left of screen)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 24.0, top: 30.0),
-                      child: GameboyPowerButton(
-                        isActive: false, // Inactive on register screen
-                        onPressed: null,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    // GameBoy Screen
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 28.0),
-                        child: AspectRatio(
-                          aspectRatio: 1.1,
-                          child: GameboyScreen(child: _buildRegisterForm()),
+                // Screen and Power button stack
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                  child: AspectRatio(
+                    aspectRatio: 1.1,
+                    child: Stack(
+                      children: [
+                        // GameBoy Screen (full width)
+                        GameboyScreen(child: _buildRegisterForm()),
+                        // Power button (positioned at top-left inside border)
+                        Positioned(
+                          left: 2.5,
+                          top: 150.0,
+                          child: GameboyPowerButton(
+                            isActive: false, // Inactive on register screen
+                            onPressed: null,
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
                 const SizedBox(height: 16),
                 // GameBoy Logo in black border container
@@ -402,7 +400,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   onPressed: () {
                                     Navigator.pushReplacement(
                                       context,
-                                      MaterialPageRoute(builder: (context) => const LoginScreen()),
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const LoginScreen(),
+                                      ),
                                     );
                                   },
                                 ),

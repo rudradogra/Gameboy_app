@@ -301,29 +301,27 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                // Screen and Power button row
-                Row(
-                  children: [
-                    // Power button (left of screen)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 24.0, top: 30.0),
-                      child: GameboyPowerButton(
-                        isActive: false, // Inactive on login screen
-                        onPressed: null,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    // GameBoy Screen
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 28.0),
-                        child: AspectRatio(
-                          aspectRatio: 1.1,
-                          child: GameboyScreen(child: _buildLoginForm()),
+                // Screen and Power button stack
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                  child: AspectRatio(
+                    aspectRatio: 1.1,
+                    child: Stack(
+                      children: [
+                        // GameBoy Screen (full width)
+                        GameboyScreen(child: _buildLoginForm()),
+                        // Power button (positioned at top-left inside border)
+                        Positioned(
+                          left: 2.5,
+                          top: 150.0,
+                          child: GameboyPowerButton(
+                            isActive: false, // Inactive on login screen
+                            onPressed: null,
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
                 const SizedBox(height: 16),
                 // GameBoy Logo in black border container

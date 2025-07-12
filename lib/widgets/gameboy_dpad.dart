@@ -95,7 +95,11 @@ class GameboyDpad extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: Icon(Icons.circle_outlined, color: Colors.white70, size: 16),
+                child: Icon(
+                  Icons.circle_outlined,
+                  color: Colors.white70,
+                  size: 16,
+                ),
               ),
             ),
           ),

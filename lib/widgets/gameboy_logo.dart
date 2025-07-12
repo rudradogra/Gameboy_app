@@ -26,4 +26,4 @@ class GameboyLogo extends StatelessWidget {
       ),
     );
   }
-} 
+}

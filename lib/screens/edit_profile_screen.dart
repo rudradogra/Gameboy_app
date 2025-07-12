@@ -11,7 +11,8 @@ import '../widgets/gameboy_power_button.dart';
 class EditProfileScreen extends StatefulWidget {
   final Map<String, dynamic> currentProfile;
 
-  const EditProfileScreen({Key? key, required this.currentProfile}) : super(key: key);
+  const EditProfileScreen({Key? key, required this.currentProfile})
+    : super(key: key);
 
   @override
   _EditProfileScreenState createState() => _EditProfileScreenState();
@@ -26,13 +27,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.currentProfile['name'].split(', ')[0]);
-    _ageController = TextEditingController(text: widget.currentProfile['age'].toString());
+    _nameController = TextEditingController(
+      text: widget.currentProfile['name'].split(', ')[0],
+    );
+    _ageController = TextEditingController(
+      text: widget.currentProfile['age'].toString(),
+    );
     _infoControllers = List.generate(
       3,
-      (index) => TextEditingController(
-        text: widget.currentProfile['info'][index],
-      ),
+      (index) =>
+          TextEditingController(text: widget.currentProfile['info'][index]),
     );
   }
 
@@ -117,7 +121,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('CANCEL', style: TextStyle(color: Colors.white70, fontFamily: 'monospace')),
+            child: const Text(
+              'CANCEL',
+              style: TextStyle(color: Colors.white70, fontFamily: 'monospace'),
+            ),
           ),
           TextButton(
             onPressed: () {
@@ -135,7 +142,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               });
               Navigator.pop(context);
             },
-            child: const Text('SAVE', style: TextStyle(color: Colors.cyanAccent, fontFamily: 'monospace')),
+            child: const Text(
+              'SAVE',
+              style: TextStyle(
+                color: Colors.cyanAccent,
+                fontFamily: 'monospace',
+              ),
+            ),
           ),
         ],
       ),
@@ -174,31 +187,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                // Screen and Power button row
-                Row(
-                  children: [
-                    // Power button (left of screen) - active for back to homepage
-                    Padding(
-                      padding: const EdgeInsets.only(left: 24.0, top: 30.0),
-                      child: GameboyPowerButton(
-                        isActive: true,
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    // GameBoy Screen
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 28.0),
-                        child: AspectRatio(
-                          aspectRatio: 1.1,
-                          child: GameboyScreen(
-                            child: _buildEditForm(),
+                // Screen and Power button stack
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                  child: AspectRatio(
+                    aspectRatio: 1.1,
+                    child: Stack(
+                      children: [
+                        // GameBoy Screen (full width)
+                        GameboyScreen(child: _buildEditForm()),
+                        // Power button (positioned at top-left inside border) - active for back to homepage
+                        Positioned(
+                          left: 2.5,
+                          top: 150.0,
+                          child: GameboyPowerButton(
+                            isActive: true,
+                            onPressed: () => Navigator.pop(context),
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
                 const SizedBox(height: 16),
                 // GameBoy Logo in black border container
@@ -316,7 +325,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          
+
           // Name field
           _buildInputField(
             0,
@@ -325,7 +334,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             _nameController.text.isEmpty,
           ),
           const SizedBox(height: 6),
-          
+
           // Age field
           _buildInputField(
             1,
@@ -334,7 +343,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             _ageController.text.isEmpty,
           ),
           const SizedBox(height: 6),
-          
+
           // Info fields
           ...List.generate(3, (index) {
             return Padding(
@@ -342,14 +351,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: _buildInputField(
                 index + 2,
                 Icons.info,
-                _infoControllers[index].text.isEmpty ? 'Info ${index + 1}' : _infoControllers[index].text,
+                _infoControllers[index].text.isEmpty
+                    ? 'Info ${index + 1}'
+                    : _infoControllers[index].text,
                 _infoControllers[index].text.isEmpty,
               ),
             );
           }),
-          
+
           const SizedBox(height: 8),
-          
+
           // Save button
           Container(
             width: double.infinity,

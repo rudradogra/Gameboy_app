@@ -119,9 +119,8 @@ class _HomePageState extends State<HomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditProfileScreen(
-          currentProfile: profiles[currentProfileIndex],
-        ),
+        builder: (context) =>
+            EditProfileScreen(currentProfile: profiles[currentProfileIndex]),
       ),
     );
   }
@@ -153,23 +152,17 @@ class _HomePageState extends State<HomePage> {
                 Column(
                   children: [
                     const SizedBox(height: 20),
-                    // Screen and Power button row
-                    Row(
-                      children: [
-                        // Power button (left of screen) - active for logout
-                        Padding(
-                          padding: const EdgeInsets.only(left: 24.0, top: 30.0),
-                          child: GameboyPowerButton(
-                            isActive: true,
-                            onPressed: _logout,
-                          ),
+                    // Screen and Power button stack
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 28.0,
+                          vertical: 16.0,
                         ),
-                        const SizedBox(width: 8),
-                        // Gameboy Screen
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 28.0, top: 16.0, bottom: 16.0),
-                            child: GameboyScreen(
+                        child: Stack(
+                          children: [
+                            // Gameboy Screen (full width)
+                            GameboyScreen(
                               child: GameboyProfileCard(
                                 key: _profileCardKey,
                                 imageUrl: currentProfile['imageUrl'],
@@ -178,9 +171,18 @@ class _HomePageState extends State<HomePage> {
                                 info: List<String>.from(currentProfile['info']),
                               ),
                             ),
-                          ),
+                            // Power button (positioned at top-left inside border) - active for logout
+                            Positioned(
+                              left: 2.5,
+                              top: 110.0,
+                              child: GameboyPowerButton(
+                                isActive: true,
+                                onPressed: _logout,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                     const SizedBox(height: 16),
                     // GameBoy Logo in black border container
@@ -253,7 +255,7 @@ class _HomePageState extends State<HomePage> {
                               // Show controls popup
                               GameboyControlsPopup.show(context, {
                                 '↑ ↓': 'Not used',
-                                '← →': 'Not used', 
+                                '← →': 'Not used',
                                 'CENTER': 'Not used',
                                 '↓': 'Toggle profile info',
                                 'A': 'Like profile',

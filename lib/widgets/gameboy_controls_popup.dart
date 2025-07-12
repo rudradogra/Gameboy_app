@@ -35,11 +35,7 @@ class GameboyControlsPopup {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        Icons.gamepad,
-                        color: Colors.cyanAccent,
-                        size: 20,
-                      ),
+                      Icon(Icons.gamepad, color: Colors.cyanAccent, size: 20),
                       const SizedBox(width: 8),
                       Text(
                         'GAMEBOY CONTROLS',
@@ -54,58 +50,74 @@ class GameboyControlsPopup {
                   ),
                 ),
                 const SizedBox(height: 16),
-                
+
                 // Controls list
-                ...controls.entries.map((entry) => Container(
-                  margin: const EdgeInsets.symmetric(vertical: 2),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 60,
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                ...controls.entries
+                    .map(
+                      (entry) => Container(
+                        margin: const EdgeInsets.symmetric(vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: Colors.grey[600]!, width: 1),
+                          color: Colors.black.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(6),
                         ),
-                        child: Text(
-                          entry.key,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'monospace',
-                          ),
-                          textAlign: TextAlign.center,
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 60,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color: Colors.grey[600]!,
+                                  width: 1,
+                                ),
+                              ),
+                              child: Text(
+                                entry.key,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'monospace',
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                entry.value,
+                                style: TextStyle(
+                                  color: Colors.grey[300],
+                                  fontSize: 11,
+                                  fontFamily: 'monospace',
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          entry.value,
-                          style: TextStyle(
-                            color: Colors.grey[300],
-                            fontSize: 11,
-                            fontFamily: 'monospace',
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                )).toList(),
-                
+                    )
+                    .toList(),
+
                 const SizedBox(height: 16),
-                
+
                 // Close button
                 GestureDetector(
                   onTap: () => Navigator.of(context).pop(),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.cyanAccent,
                       borderRadius: BorderRadius.circular(8),
