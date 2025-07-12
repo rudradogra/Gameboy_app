@@ -9,7 +9,10 @@ class GameboyScreen extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.black,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(18), // Matches screen bottom radius
+          topRight: Radius.circular(18), // Matches screen bottom radius
+        ),
         border: Border.all(color: Colors.black, width: 16), // Increased border
         boxShadow: [
           BoxShadow(

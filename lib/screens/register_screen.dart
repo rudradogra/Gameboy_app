@@ -6,7 +6,6 @@ import '../widgets/gameboy_pill_button.dart';
 import '../widgets/gameboy_speaker_dots.dart';
 import '../widgets/gameboy_logo.dart';
 import '../widgets/gameboy_controls_popup.dart';
-import '../widgets/gameboy_power_button.dart';
 import 'login_screen.dart';
 import 'homepage.dart';
 
@@ -43,6 +42,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
           break;
         case 'down':
           selectedField = (selectedField + 1) % menuItems.length;
+          break;
+        case 'center':
+          // Handle current item selection when center is pressed
+          _handleAButton();
           break;
       }
     });
@@ -133,6 +136,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  void _handleLogout() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
     );
   }
 
@@ -345,21 +355,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 28.0),
                   child: AspectRatio(
                     aspectRatio: 1.1,
-                    child: Stack(
-                      children: [
-                        // GameBoy Screen (full width)
-                        GameboyScreen(child: _buildRegisterForm()),
-                        // Power button (positioned at top-left inside border)
-                        Positioned(
-                          left: 2.5,
-                          top: 150.0,
-                          child: GameboyPowerButton(
-                            isActive: false, // Inactive on register screen
-                            onPressed: null,
-                          ),
-                        ),
-                      ],
-                    ),
+                    child: GameboyScreen(child: _buildRegisterForm()),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -368,7 +364,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 28.0),
                   child: const GameboyLogo(),
                 ),
-                const SizedBox(height: 18),
                 // Controls section
                 Expanded(
                   child: Row(
@@ -437,10 +432,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           GameboyControlsPopup.show(context, {
                             '↑ ↓': 'Navigate menu items',
                             '← →': 'Not used',
-                            'CENTER': 'Not used',
+                            'CENTER': 'Select current item',
                             'A': 'Select/Edit field',
                             'B': 'Back to Login',
-                            'START': 'Select current item',
+                            'START': 'Back to Login',
                             'SELECT': 'Show controls (this popup)',
                           });
                         },
@@ -448,7 +443,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       const SizedBox(width: 24),
                       GameboyPillButton(
                         label: 'START',
-                        onPressed: _handleAButton,
+                        onPressed: _handleLogout,
                       ),
                     ],
                   ),

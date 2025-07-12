@@ -10,8 +10,11 @@ class GameboyLogo extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.black,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[700]!, width: 2),
+        borderRadius: BorderRadius.only(
+          // Matches screen bottom radius
+          bottomLeft: Radius.circular(18),
+          bottomRight: Radius.circular(18),
+        ),
       ),
       child: Text(
         'GAME BOY',

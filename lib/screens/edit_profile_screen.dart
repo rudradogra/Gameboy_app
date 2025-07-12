@@ -6,7 +6,7 @@ import '../widgets/gameboy_pill_button.dart';
 import '../widgets/gameboy_speaker_dots.dart';
 import '../widgets/gameboy_logo.dart';
 import '../widgets/gameboy_controls_popup.dart';
-import '../widgets/gameboy_power_button.dart';
+import 'login_screen.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final Map<String, dynamic> currentProfile;
@@ -57,6 +57,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         if (selectedField < 0) selectedField = 5;
       } else if (direction == 'down') {
         selectedField = (selectedField + 1) % 6;
+      } else if (direction == 'center') {
+        // Edit selected field when center is pressed
+        _handleAButton();
       }
     });
   }
@@ -68,6 +71,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     } else {
       _showEditDialog(selectedField);
     }
+  }
+
+  void _handleLogout() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+    );
   }
 
   void _showEditDialog(int fieldIndex) {
@@ -192,24 +202,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 28.0),
                   child: AspectRatio(
                     aspectRatio: 1.1,
-                    child: Stack(
-                      children: [
-                        // GameBoy Screen (full width)
-                        GameboyScreen(child: _buildEditForm()),
-                        // Power button (positioned at top-left inside border) - active for back to homepage
-                        Positioned(
-                          left: 2.5,
-                          top: 150.0,
-                          child: GameboyPowerButton(
-                            isActive: true,
-                            onPressed: () => Navigator.pop(context),
-                          ),
-                        ),
-                      ],
-                    ),
+                    child: GameboyScreen(child: _buildEditForm()),
                   ),
                 ),
-                const SizedBox(height: 16),
                 // GameBoy Logo in black border container
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 28.0),
@@ -276,10 +271,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           GameboyControlsPopup.show(context, {
                             '↑ ↓': 'Navigate form fields',
                             '← →': 'Not used',
-                            'CENTER': 'Not used',
+                            'CENTER': 'Edit selected field',
                             'A': 'Edit selected field',
                             'B': 'Back to homepage',
-                            'START': 'Edit selected field',
+                            'START': 'Logout',
                             'SELECT': 'Show controls (this popup)',
                           });
                         },
@@ -287,7 +282,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       const SizedBox(width: 24),
                       GameboyPillButton(
                         label: 'START',
-                        onPressed: _handleAButton,
+                        onPressed: _handleLogout,
                       ),
                     ],
                   ),

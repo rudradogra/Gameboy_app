@@ -7,7 +7,6 @@ import '../widgets/gameboy_speaker_dots.dart';
 import '../widgets/gameboy_logo.dart';
 import '../widgets/gameboy_profile_card.dart';
 import '../widgets/gameboy_controls_popup.dart';
-import '../widgets/gameboy_power_button.dart';
 import 'login_screen.dart';
 import 'edit_profile_screen.dart';
 
@@ -50,6 +49,9 @@ class _HomePageState extends State<HomePage> {
     if (direction == 'down') {
       // Toggle the profile info when down is pressed
       _profileCardKey.currentState?.toggleInfo();
+    } else if (direction == 'center') {
+      // Edit profile when center is pressed
+      _editProfile();
     }
     print('D-pad pressed: $direction');
   }
@@ -153,38 +155,21 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     const SizedBox(height: 20),
                     // Screen and Power button stack
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 28.0,
-                          vertical: 16.0,
-                        ),
-                        child: Stack(
-                          children: [
-                            // Gameboy Screen (full width)
-                            GameboyScreen(
-                              child: GameboyProfileCard(
-                                key: _profileCardKey,
-                                imageUrl: currentProfile['imageUrl'],
-                                name: currentProfile['name'],
-                                age: currentProfile['age'],
-                                info: List<String>.from(currentProfile['info']),
-                              ),
-                            ),
-                            // Power button (positioned at top-left inside border) - active for logout
-                            Positioned(
-                              left: 2.5,
-                              top: 110.0,
-                              child: GameboyPowerButton(
-                                isActive: true,
-                                onPressed: _logout,
-                              ),
-                            ),
-                          ],
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                      child: AspectRatio(
+                        aspectRatio: 1.1,
+                        child: GameboyScreen(
+                          child: GameboyProfileCard(
+                            key: _profileCardKey,
+                            imageUrl: currentProfile['imageUrl'],
+                            name: currentProfile['name'],
+                            age: currentProfile['age'],
+                            info: List<String>.from(currentProfile['info']),
+                          ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
                     // GameBoy Logo in black border container
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 28.0),
@@ -256,11 +241,11 @@ class _HomePageState extends State<HomePage> {
                               GameboyControlsPopup.show(context, {
                                 '↑ ↓': 'Not used',
                                 '← →': 'Not used',
-                                'CENTER': 'Not used',
+                                'CENTER': 'Edit your profile',
                                 '↓': 'Toggle profile info',
                                 'A': 'Like profile',
                                 'B': 'Pass on profile',
-                                'START': 'Edit your profile',
+                                'START': 'Logout',
                                 'SELECT': 'Show controls (this popup)',
                               });
                             },
@@ -268,7 +253,7 @@ class _HomePageState extends State<HomePage> {
                           const SizedBox(width: 24),
                           GameboyPillButton(
                             label: 'START',
-                            onPressed: _editProfile,
+                            onPressed: _logout,
                           ),
                         ],
                       ),

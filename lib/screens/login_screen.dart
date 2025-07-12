@@ -6,7 +6,6 @@ import '../widgets/gameboy_pill_button.dart';
 import '../widgets/gameboy_speaker_dots.dart';
 import '../widgets/gameboy_logo.dart';
 import '../widgets/gameboy_controls_popup.dart';
-import '../widgets/gameboy_power_button.dart';
 import 'register_screen.dart';
 import 'homepage.dart';
 
@@ -35,6 +34,10 @@ class _LoginScreenState extends State<LoginScreen> {
           break;
         case 'down':
           selectedField = (selectedField + 1) % menuItems.length;
+          break;
+        case 'center':
+          // Handle login when center is pressed
+          _handleAButton();
           break;
       }
     });
@@ -66,6 +69,37 @@ class _LoginScreenState extends State<LoginScreen> {
         );
         break;
     }
+  }
+
+  void _handleLogout() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Color(0xFF8B0000),
+        title: Text(
+          'Exit App',
+          style: TextStyle(color: Colors.white, fontFamily: 'monospace'),
+        ),
+        content: Text(
+          'Are you sure you want to exit the app?',
+          style: TextStyle(color: Colors.white70, fontFamily: 'monospace'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel', style: TextStyle(color: Colors.white70)),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // Exit the app
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            },
+            child: Text('Exit', style: TextStyle(color: Colors.cyanAccent)),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showInputDialog(
@@ -306,24 +340,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 28.0),
                   child: AspectRatio(
                     aspectRatio: 1.1,
-                    child: Stack(
-                      children: [
-                        // GameBoy Screen (full width)
-                        GameboyScreen(child: _buildLoginForm()),
-                        // Power button (positioned at top-left inside border)
-                        Positioned(
-                          left: 2.5,
-                          top: 150.0,
-                          child: GameboyPowerButton(
-                            isActive: false, // Inactive on login screen
-                            onPressed: null,
-                          ),
-                        ),
-                      ],
-                    ),
+                    child: GameboyScreen(child: _buildLoginForm()),
                   ),
                 ),
-                const SizedBox(height: 16),
                 // GameBoy Logo in black border container
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 28.0),
@@ -390,10 +409,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           GameboyControlsPopup.show(context, {
                             '↑ ↓': 'Navigate menu items',
                             '← →': 'Not used',
-                            'CENTER': 'Not used',
+                            'CENTER': 'Select/Login',
                             'A': 'Select/Login',
                             'B': 'Disabled (grayed out)',
-                            'START': 'Login',
+                            'START': 'Exit App',
                             'SELECT': 'Show controls (this popup)',
                           });
                         },
@@ -401,7 +420,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(width: 24),
                       GameboyPillButton(
                         label: 'START',
-                        onPressed: _handleAButton,
+                        onPressed: _handleLogout,
                       ),
                     ],
                   ),
