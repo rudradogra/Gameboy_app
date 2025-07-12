@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class GameboyProfileCard extends StatefulWidget {
-  final String imageUrl;
+  final List<String>imageUrl;
   final String name;
   final int age;
   final List<String> info;
@@ -23,6 +23,21 @@ class GameboyProfileCardState extends State<GameboyProfileCard> with SingleTicke
   bool _showInfo = false;
   late AnimationController _animationController;
   late Animation<double> _animation;
+  int _currentImageIndex = 0;
+
+  void handleDirection(String direction) {
+    setState(() {
+      if (direction == 'left') {
+        _currentImageIndex = (_currentImageIndex - 1) % widget.imageUrl.length;
+      } else if (direction == 'right') {
+        _currentImageIndex = (_currentImageIndex + 1) % widget.imageUrl.length;
+      }
+      // Ensure index is not negative
+      if (_currentImageIndex < 0) {
+        _currentImageIndex = widget.imageUrl.length - 1;
+      }
+    });
+  }
 
   @override
   void initState() {
@@ -62,7 +77,7 @@ class GameboyProfileCardState extends State<GameboyProfileCard> with SingleTicke
         ClipRRect(
           borderRadius: BorderRadius.circular(12),
           child: Image.network(
-            widget.imageUrl,
+            widget.imageUrl[_currentImageIndex],
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) => Container(
               color: Colors.grey[300],

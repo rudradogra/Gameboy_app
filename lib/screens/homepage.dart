@@ -23,22 +23,21 @@ class _HomePageState extends State<HomePage> {
 
   final List<Map<String, dynamic>> profiles = [
     {
-      'imageUrl':
-          'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
+      'imageUrls': [
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
+        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face',
+        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop&crop=face',
+      ],
       'name': 'Rudra Dogra',
       'age': 19,
       'info': ['Software Developer', 'From Delhi', 'Loves coding and gaming!'],
     },
     {
-      'imageUrl':
-          'https://images.unsplash.com/photo-1494790108755-2616c0763b13?w=400&h=400&fit=crop&crop=face',
-      'name': 'Sarah Chen',
-      'age': 22,
-      'info': ['Graphic Designer', 'From Tokyo', 'Art and coffee enthusiast'],
-    },
-    {
-      'imageUrl':
-          'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face',
+      'imageUrls': [
+        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face',
+        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face',
+        'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=face',
+      ],
       'name': 'Alex Rodriguez',
       'age': 25,
       'info': ['Photographer', 'From Barcelona', 'Adventure seeker'],
@@ -55,6 +54,9 @@ class _HomePageState extends State<HomePage> {
     } else if (direction == 'up') {
       // Superlike when up is pressed
       _handleSuperlike();
+    } else if (direction == 'left' || direction == 'right') {
+      // Forward left/right to profile card for image navigation
+      _profileCardKey.currentState?.handleDirection(direction);
     }
     print('D-pad pressed: $direction');
   }
@@ -176,7 +178,7 @@ class _HomePageState extends State<HomePage> {
                         child: GameboyScreen(
                           child: GameboyProfileCard(
                             key: _profileCardKey,
-                            imageUrl: currentProfile['imageUrl'],
+                            imageUrl: currentProfile['imageUrls'],
                             name: currentProfile['name'],
                             age: currentProfile['age'],
                             info: List<String>.from(currentProfile['info']),
