@@ -131,55 +131,49 @@ class GameboyProfileCardState extends State<GameboyProfileCard> with SingleTicke
               ),
               
               // Name Bar (always visible)
-              GestureDetector(
-                onTap: toggleInfo,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: const Radius.circular(12),
-                      bottomRight: const Radius.circular(12),
-                      topLeft: _showInfo
-                          ? const Radius.circular(0)
-                          : const Radius.circular(12),
-                      topRight: _showInfo
-                          ? const Radius.circular(0)
-                          : const Radius.circular(12),
-                    ),
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      colors: [
-                        Colors.black.withOpacity(0.8),
-                        Colors.transparent,
-                      ],
-                    ),
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: const Radius.circular(12),
+                    bottomRight: const Radius.circular(12),
+                    topLeft: _showInfo
+                        ? const Radius.circular(0)
+                        : const Radius.circular(12),
+                    topRight: _showInfo
+                        ? const Radius.circular(0)
+                        : const Radius.circular(12),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '${widget.name}, ${widget.age}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontFamily: 'monospace',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          shadows: [
-                            Shadow(
-                              offset: Offset(1, 1),
-                              blurRadius: 2,
-                              color: Colors.black,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Icon(
-                        _showInfo ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_up,
-                        color: Colors.white,
-                      ),
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [
+                      Colors.black.withOpacity(0.8),
+                      Colors.transparent,
                     ],
                   ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '${widget.name}, ${widget.age}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'monospace',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        shadows: [
+                          Shadow(
+                            offset: Offset(1, 1),
+                            blurRadius: 2,
+                            color: Colors.black,
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                  ],
                 ),
               ),
             ],

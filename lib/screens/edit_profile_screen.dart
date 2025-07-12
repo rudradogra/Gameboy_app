@@ -387,38 +387,35 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Widget _buildInputField(int index, IconData icon, String text, bool isEmpty) {
-    return GestureDetector(
-      onTap: () => _showEditDialog(index),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: selectedField == index
-              ? Colors.yellow.withOpacity(0.3)
-              : Colors.white.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(4),
-          border: Border.all(
-            color: selectedField == index ? Colors.black : Colors.grey,
-            width: 1,
-          ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: selectedField == index
+            ? Colors.yellow.withOpacity(0.3)
+            : Colors.white.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(
+          color: selectedField == index ? Colors.black : Colors.grey,
+          width: 1,
         ),
-        child: Row(
-          children: [
-            Icon(icon, color: Colors.black, size: 14),
-            const SizedBox(width: 4),
-            Expanded(
-              child: Text(
-                text,
-                style: TextStyle(
-                  color: isEmpty ? Colors.grey[600] : Colors.black,
-                  fontFamily: 'monospace',
-                  fontSize: 10,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.black, size: 14),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: isEmpty ? Colors.grey[600] : Colors.black,
+                fontFamily: 'monospace',
+                fontSize: 10,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
