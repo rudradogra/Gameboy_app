@@ -7,6 +7,7 @@ import '../widgets/gameboy_speaker_dots.dart';
 import '../widgets/gameboy_logo.dart';
 import '../widgets/gameboy_profile_card.dart';
 import 'login_screen.dart';
+import 'edit_profile_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -104,6 +105,17 @@ class _HomePageState extends State<HomePage> {
             child: Text('Logout', style: TextStyle(color: Colors.cyanAccent)),
           ),
         ],
+      ),
+    );
+  }
+
+  void _editProfile() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditProfileScreen(
+          currentProfile: profiles[currentProfileIndex],
+        ),
       ),
     );
   }
@@ -212,12 +224,12 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           GameboyPillButton(
                             label: 'SELECT',
-                            onPressed: _logout,
+                            onPressed: _editProfile,
                           ),
                           const SizedBox(width: 24),
                           GameboyPillButton(
                             label: 'START',
-                            onPressed: _nextProfile,
+                            onPressed: _logout,
                           ),
                         ],
                       ),
