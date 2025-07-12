@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class GameboyProfileCard extends StatefulWidget {
-  final List<String>imageUrl;
+  final List<String> imageUrl;
   final String name;
   final int age;
   final List<String> info;
@@ -19,7 +19,8 @@ class GameboyProfileCard extends StatefulWidget {
   GameboyProfileCardState createState() => GameboyProfileCardState();
 }
 
-class GameboyProfileCardState extends State<GameboyProfileCard> with SingleTickerProviderStateMixin {
+class GameboyProfileCardState extends State<GameboyProfileCard>
+    with SingleTickerProviderStateMixin {
   bool _showInfo = false;
   late AnimationController _animationController;
   late Animation<double> _animation;
@@ -85,7 +86,7 @@ class GameboyProfileCardState extends State<GameboyProfileCard> with SingleTicke
             ),
           ),
         ),
-        
+
         // Info Panel (collapsible)
         Positioned(
           left: 0,
@@ -112,27 +113,36 @@ class GameboyProfileCardState extends State<GameboyProfileCard> with SingleTicke
                     children: [
                       Text(
                         'About',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                             ),
                       ),
                       const SizedBox(height: 8),
-                      ...widget.info.map((item) => Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 2.0),
-                            child: Text(
-                              '• $item',
-                              style: const TextStyle(color: Colors.white, fontFamily: 'PublicPixel'),
+                      ...widget.info.map(
+                        (item) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2.0),
+                          child: Text(
+                            '• $item',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'PublicPixel',
                             ),
-                          )),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ),
-              
+
               // Name Bar (always visible)
               Container(
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 16,
+                ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.only(
                     bottomLeft: const Radius.circular(12),
@@ -147,10 +157,7 @@ class GameboyProfileCardState extends State<GameboyProfileCard> with SingleTicke
                   gradient: LinearGradient(
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
-                    colors: [
-                      Colors.black.withOpacity(0.8),
-                      Colors.transparent,
-                    ],
+                    colors: [Colors.black.withOpacity(0.8), Colors.transparent],
                   ),
                 ),
                 child: Row(
@@ -162,7 +169,7 @@ class GameboyProfileCardState extends State<GameboyProfileCard> with SingleTicke
                         color: Colors.white,
                         fontFamily: 'PublicPixel',
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 10, // Reduced from 16
                         shadows: [
                           Shadow(
                             offset: Offset(1, 1),
@@ -172,27 +179,25 @@ class GameboyProfileCardState extends State<GameboyProfileCard> with SingleTicke
                         ],
                       ),
                     ),
-                    
                   ],
                 ),
               ),
             ],
           ),
         ),
-        
+
         // Hearts in top right
         Positioned(
           top: 12,
           right: 12,
           child: Row(
-            children: List.generate(5, (index) => const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 2.0),
-              child: Icon(
-                Icons.favorite,
-                color: Colors.red,
-                size: 20,
+            children: List.generate(
+              5,
+              (index) => const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 2.0),
+                child: Icon(Icons.favorite, color: Colors.red, size: 20),
               ),
-            )),
+            ),
           ),
         ),
       ],

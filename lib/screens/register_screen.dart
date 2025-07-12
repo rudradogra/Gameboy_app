@@ -125,14 +125,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: TextStyle(color: Colors.white70, fontFamily: 'PublicPixel')),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: Colors.white70,
+                fontFamily: 'PublicPixel',
+              ),
+            ),
           ),
           TextButton(
             onPressed: () {
               onSave(tempValue);
               Navigator.pop(context);
             },
-            child: Text('Save', style: TextStyle(color: Colors.cyanAccent, fontFamily: 'PublicPixel')),
+            child: Text(
+              'Save',
+              style: TextStyle(
+                color: Colors.cyanAccent,
+                fontFamily: 'PublicPixel',
+              ),
+            ),
           ),
         ],
       ),
@@ -185,7 +197,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Widget _buildRegisterForm() {
     return Padding(
-      padding: const EdgeInsets.all(12.0),
+      padding: const EdgeInsets.all(8.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -193,7 +205,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             'REGISTER',
             style: TextStyle(
               color: Colors.black,
-              fontSize: 14,
+              fontSize: 12, // Reduced from 14
               fontWeight: FontWeight.bold,
               fontFamily: 'PublicPixel',
             ),
@@ -259,12 +271,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 color: selectedField == 4 ? Colors.black : Colors.white,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'PublicPixel',
-                fontSize: 12,
+                fontSize: 10, // Reduced from 12
               ),
             ),
           ),
-
-          SizedBox(height: 4),
 
           // Login link
           Container(
@@ -286,7 +296,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               style: TextStyle(
                 color: Colors.black87,
                 fontFamily: 'PublicPixel',
-                fontSize: 9,
+                fontSize: 8, // Reduced from 9
                 decoration: TextDecoration.underline,
               ),
             ),
@@ -331,132 +341,135 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF181818),
-      body: Center(
-        child: AspectRatio(
-          aspectRatio: 2 / 3.7,
-          child: Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFF8B0000),
-              borderRadius: BorderRadius.circular(40),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.cyanAccent.withOpacity(0.3),
-                  blurRadius: 20,
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                // Screen and Power button stack
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 28.0),
-                  child: AspectRatio(
-                    aspectRatio: 1.1,
-                    child: GameboyScreen(child: _buildRegisterForm()),
+      backgroundColor: const Color(0xFF1A1A1A), // Subtle dark background
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        child: Center(
+          child: AspectRatio(
+            aspectRatio: 2 / 3.7,
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFF8B0000),
+                borderRadius: BorderRadius.circular(40),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.redAccent.withOpacity(0.3),
+                    blurRadius: 20,
+                    spreadRadius: 2,
                   ),
-                ),
-                const SizedBox(height: 16),
-                // GameBoy Logo in black border container
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 28.0),
-                  child: const GameboyLogo(),
-                ),
-                // Controls section
-                Expanded(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(width: 20),
-                      // D-pad
-                      Padding(
-                        padding: const EdgeInsets.only(left: 16.0, top: 16.0),
-                        child: GameboyDpad(
-                          onDirectionPressed: _handleDpadNavigation,
-                        ),
-                      ),
-                      const Spacer(),
-                      // A/B buttons (diagonal layout)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 32.0, top: 8.0),
-                        child: SizedBox(
-                          width: 120,
-                          height: 100,
-                          child: Stack(
-                            children: [
-                              // B button (bottom-left)
-                              Positioned(
-                                left: 0,
-                                top: 50,
-                                child: GameboyButton(
-                                  label: 'B',
-                                  onPressed: () {
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const LoginScreen(),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                              // A button (top-right)
-                              Positioned(
-                                right: 0,
-                                top: 0,
-                                child: GameboyButton(
-                                  label: 'A',
-                                  onPressed: _handleAButton,
-                                ),
-                              ),
-                            ],
+                ],
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  // Screen and Power button stack
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                    child: AspectRatio(
+                      aspectRatio: 1.1,
+                      child: GameboyScreen(child: _buildRegisterForm()),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // GameBoy Logo in black border container
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                    child: const GameboyLogo(),
+                  ),
+                  // Controls section
+                  Expanded(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(width: 20),
+                        // D-pad
+                        Padding(
+                          padding: const EdgeInsets.only(left: 16.0, top: 16.0),
+                          child: GameboyDpad(
+                            onDirectionPressed: _handleDpadNavigation,
                           ),
                         ),
-                      ),
-                    ],
+                        const Spacer(),
+                        // A/B buttons (diagonal layout)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 32.0, top: 8.0),
+                          child: SizedBox(
+                            width: 120,
+                            height: 100,
+                            child: Stack(
+                              children: [
+                                // B button (bottom-left)
+                                Positioned(
+                                  left: 0,
+                                  top: 50,
+                                  child: GameboyButton(
+                                    label: 'B',
+                                    onPressed: () {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const LoginScreen(),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                // A button (top-right)
+                                Positioned(
+                                  right: 0,
+                                  top: 0,
+                                  child: GameboyButton(
+                                    label: 'A',
+                                    onPressed: _handleAButton,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                // Select/Start row
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GameboyPillButton(
-                        label: 'SELECT',
-                        onPressed: () {
-                          // Show controls popup
-                          GameboyControlsPopup.show(context, {
-                            '↑ ↓': 'Navigate menu items',
-                            '← →': 'Not used',
-                            'CENTER': 'Select current item',
-                            'A': 'Select/Edit field',
-                            'B': 'Back to Login',
-                            'START': 'Back to Login',
-                            'SELECT': 'Show controls (this popup)',
-                          });
-                        },
-                      ),
-                      const SizedBox(width: 24),
-                      GameboyPillButton(
-                        label: 'START',
-                        onPressed: _handleLogout,
-                      ),
-                    ],
+                  // Select/Start row
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GameboyPillButton(
+                          label: 'SELECT',
+                          onPressed: () {
+                            // Show controls popup
+                            GameboyControlsPopup.show(context, {
+                              '↑ ↓': 'Navigate menu items',
+                              '← →': 'Not used',
+                              'CENTER': 'Select current item',
+                              'A': 'Select/Edit field',
+                              'B': 'Back to Login',
+                              'START': 'Back to Login',
+                              'SELECT': 'Show controls (this popup)',
+                            });
+                          },
+                        ),
+                        const SizedBox(width: 24),
+                        GameboyPillButton(
+                          label: 'START',
+                          onPressed: _handleLogout,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                // Speaker dots
-                Padding(
-                  padding: const EdgeInsets.only(right: 32.0, bottom: 18.0),
-                  child: Align(
-                    alignment: Alignment.bottomRight,
-                    child: GameboySpeakerDots(),
+                  // Speaker dots
+                  Padding(
+                    padding: const EdgeInsets.only(right: 32.0, bottom: 18.0),
+                    child: Align(
+                      alignment: Alignment.bottomRight,
+                      child: GameboySpeakerDots(),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
