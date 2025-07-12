@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'grainy_texture.dart';
 
 class GameboyDpad extends StatelessWidget {
   final Function(String)? onDirectionPressed;
@@ -15,26 +16,28 @@ class GameboyDpad extends StatelessWidget {
         alignment: alignment,
         child: GestureDetector(
           onTap: () => onDirectionPressed?.call(direction),
-          child: Container(
-            width: 35,
-            height: 35,
-            decoration: BoxDecoration(
-              color: Colors.black87,
-              borderRadius: BorderRadius.circular(6),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black45,
-                  blurRadius: 3,
-                  offset: Offset(1, 1),
-                ),
-                BoxShadow(
-                  color: Colors.white24,
-                  blurRadius: 1,
-                  offset: Offset(-0.5, -0.5),
-                ),
-              ],
+          child: GrainyContainer(
+            color: Colors.black87,
+            borderRadius: BorderRadius.circular(6),
+            intensity: 0.3,
+            seed: direction.hashCode, // Unique grain per direction
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black45,
+                blurRadius: 3,
+                offset: Offset(1, 1),
+              ),
+              BoxShadow(
+                color: Colors.white24,
+                blurRadius: 1,
+                offset: Offset(-0.5, -0.5),
+              ),
+            ],
+            child: Container(
+              width: 35,
+              height: 35,
+              child: Icon(icon, color: Colors.white70, size: 20),
             ),
-            child: Icon(icon, color: Colors.white70, size: 20),
           ),
         ),
       ),
@@ -76,29 +79,31 @@ class GameboyDpad extends StatelessWidget {
           Center(
             child: GestureDetector(
               onTap: () => onDirectionPressed?.call('center'),
-              child: Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: Colors.black87,
-                  borderRadius: BorderRadius.circular(4),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black45,
-                      blurRadius: 2,
-                      offset: Offset(1, 1),
-                    ),
-                    BoxShadow(
-                      color: Colors.white24,
-                      blurRadius: 1,
-                      offset: Offset(-0.5, -0.5),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  Icons.circle_outlined,
-                  color: Colors.white70,
-                  size: 16,
+              child: GrainyContainer(
+                color: Colors.black87,
+                borderRadius: BorderRadius.circular(4),
+                intensity: 0.3,
+                seed: 'center'.hashCode,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black45,
+                    blurRadius: 2,
+                    offset: Offset(1, 1),
+                  ),
+                  BoxShadow(
+                    color: Colors.white24,
+                    blurRadius: 1,
+                    offset: Offset(-0.5, -0.5),
+                  ),
+                ],
+                child: Container(
+                  width: 28,
+                  height: 28,
+                  child: Icon(
+                    Icons.circle_outlined,
+                    color: Colors.white70,
+                    size: 16,
+                  ),
                 ),
               ),
             ),

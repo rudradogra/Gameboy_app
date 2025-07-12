@@ -62,7 +62,7 @@ class GameboyActionPopup {
                       color: Colors.white,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      fontFamily: 'monospace',
+                      fontFamily: 'PublicPixel',
                       shadows: [
                         Shadow(
                           offset: Offset(1, 1),
@@ -81,7 +81,7 @@ class GameboyActionPopup {
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 12,
-                      fontFamily: 'monospace',
+                      fontFamily: 'PublicPixel',
                       shadows: [
                         Shadow(
                           offset: Offset(1, 1),

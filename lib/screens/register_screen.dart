@@ -106,12 +106,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
         backgroundColor: Color(0xFF8B0000),
         title: Text(
           title,
-          style: TextStyle(color: Colors.white, fontFamily: 'monospace'),
+          style: TextStyle(color: Colors.white, fontFamily: 'PublicPixel'),
         ),
         content: TextField(
           controller: TextEditingController(text: currentValue),
           obscureText: isPassword,
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white, fontFamily: 'PublicPixel'),
           decoration: InputDecoration(
             enabledBorder: UnderlineInputBorder(
               borderSide: BorderSide(color: Colors.cyanAccent),
@@ -125,14 +125,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: TextStyle(color: Colors.white70)),
+            child: Text('Cancel', style: TextStyle(color: Colors.white70, fontFamily: 'PublicPixel')),
           ),
           TextButton(
             onPressed: () {
               onSave(tempValue);
               Navigator.pop(context);
             },
-            child: Text('Save', style: TextStyle(color: Colors.cyanAccent)),
+            child: Text('Save', style: TextStyle(color: Colors.cyanAccent, fontFamily: 'PublicPixel')),
           ),
         ],
       ),
@@ -195,7 +195,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               color: Colors.black,
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              fontFamily: 'monospace',
+              fontFamily: 'PublicPixel',
             ),
           ),
           SizedBox(height: 10),
@@ -258,7 +258,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               style: TextStyle(
                 color: selectedField == 4 ? Colors.black : Colors.white,
                 fontWeight: FontWeight.bold,
-                fontFamily: 'monospace',
+                fontFamily: 'PublicPixel',
                 fontSize: 12,
               ),
             ),
@@ -285,7 +285,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.black87,
-                fontFamily: 'monospace',
+                fontFamily: 'PublicPixel',
                 fontSize: 9,
                 decoration: TextDecoration.underline,
               ),
@@ -318,7 +318,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               text,
               style: TextStyle(
                 color: isEmpty ? Colors.grey[600] : Colors.black,
-                fontFamily: 'monospace',
+                fontFamily: 'PublicPixel',
                 fontSize: 10,
               ),
             ),

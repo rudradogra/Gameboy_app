@@ -26,7 +26,7 @@ class GameboyButtonGuide extends StatelessWidget {
               color: Colors.cyanAccent,
               fontSize: 9,
               fontWeight: FontWeight.bold,
-              fontFamily: 'monospace',
+              fontFamily: 'PublicPixel',
             ),
             textAlign: TextAlign.center,
           ),
@@ -45,7 +45,7 @@ class GameboyButtonGuide extends StatelessWidget {
                             color: Colors.white,
                             fontSize: 7,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'monospace',
+                            fontFamily: 'PublicPixel',
                           ),
                         ),
                       ),
@@ -54,7 +54,7 @@ class GameboyButtonGuide extends StatelessWidget {
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 7,
-                          fontFamily: 'monospace',
+                          fontFamily: 'PublicPixel',
                         ),
                       ),
                       Expanded(
@@ -63,7 +63,7 @@ class GameboyButtonGuide extends StatelessWidget {
                           style: TextStyle(
                             color: Colors.grey[300],
                             fontSize: 7,
-                            fontFamily: 'monospace',
+                            fontFamily: 'PublicPixel',
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),

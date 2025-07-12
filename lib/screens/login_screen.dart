@@ -6,6 +6,7 @@ import '../widgets/gameboy_pill_button.dart';
 import '../widgets/gameboy_speaker_dots.dart';
 import '../widgets/gameboy_logo.dart';
 import '../widgets/gameboy_controls_popup.dart';
+import '../widgets/gameboy_action_popup.dart';
 import 'register_screen.dart';
 import 'homepage.dart';
 
@@ -78,16 +79,22 @@ class _LoginScreenState extends State<LoginScreen> {
         backgroundColor: Color(0xFF8B0000),
         title: Text(
           'Exit App',
-          style: TextStyle(color: Colors.white, fontFamily: 'monospace'),
+          style: TextStyle(color: Colors.white, fontFamily: 'PublicPixel'),
         ),
         content: Text(
           'Are you sure you want to exit the app?',
-          style: TextStyle(color: Colors.white70, fontFamily: 'monospace'),
+          style: TextStyle(color: Colors.white70, fontFamily: 'PublicPixel'),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: TextStyle(color: Colors.white70)),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: Colors.white70,
+                fontFamily: 'PublicPixel',
+              ),
+            ),
           ),
           TextButton(
             onPressed: () {
@@ -95,7 +102,13 @@ class _LoginScreenState extends State<LoginScreen> {
               // Exit the app
               Navigator.of(context).popUntil((route) => route.isFirst);
             },
-            child: Text('Exit', style: TextStyle(color: Colors.cyanAccent)),
+            child: Text(
+              'Exit',
+              style: TextStyle(
+                color: Colors.cyanAccent,
+                fontFamily: 'PublicPixel',
+              ),
+            ),
           ),
         ],
       ),
@@ -115,12 +128,12 @@ class _LoginScreenState extends State<LoginScreen> {
         backgroundColor: Color(0xFF8B0000),
         title: Text(
           title,
-          style: TextStyle(color: Colors.white, fontFamily: 'monospace'),
+          style: TextStyle(color: Colors.white, fontFamily: 'PublicPixel'),
         ),
         content: TextField(
           controller: TextEditingController(text: currentValue),
           obscureText: isPassword,
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white, fontFamily: 'PublicPixel'),
           decoration: InputDecoration(
             enabledBorder: UnderlineInputBorder(
               borderSide: BorderSide(color: Colors.cyanAccent),
@@ -134,14 +147,26 @@ class _LoginScreenState extends State<LoginScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: TextStyle(color: Colors.white70)),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: Colors.white70,
+                fontFamily: 'PublicPixel',
+              ),
+            ),
           ),
           TextButton(
             onPressed: () {
               onSave(tempValue);
               Navigator.pop(context);
             },
-            child: Text('Save', style: TextStyle(color: Colors.cyanAccent)),
+            child: Text(
+              'Save',
+              style: TextStyle(
+                color: Colors.cyanAccent,
+                fontFamily: 'PublicPixel',
+              ),
+            ),
           ),
         ],
       ),
@@ -151,24 +176,28 @@ class _LoginScreenState extends State<LoginScreen> {
   void _performLogin() {
     if (username.isNotEmpty && password.isNotEmpty) {
       // Simple validation - in real app, use proper authentication
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Login Successful!'),
-          backgroundColor: Colors.green,
-        ),
+      GameboyActionPopup.show(
+        context,
+        title: 'Success',
+        message: 'Login Successful!',
+        backgroundColor: Colors.green,
+        icon: Icons.check_circle,
       );
 
       // Navigate to HomePage after successful login
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
-      );
+      Future.delayed(Duration(milliseconds: 800), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+      });
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Please fill in all fields'),
-          backgroundColor: Colors.red,
-        ),
+      GameboyActionPopup.show(
+        context,
+        title: 'Error',
+        message: 'Please fill in all fields',
+        backgroundColor: Colors.red,
+        icon: Icons.error,
       );
     }
   }
@@ -185,7 +214,7 @@ class _LoginScreenState extends State<LoginScreen> {
               color: Colors.black,
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              fontFamily: 'monospace',
+              fontFamily: 'PublicPixel',
             ),
           ),
           SizedBox(height: 16),
@@ -212,7 +241,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     username.isEmpty ? 'Username' : username,
                     style: TextStyle(
                       color: username.isEmpty ? Colors.grey[600] : Colors.black,
-                      fontFamily: 'monospace',
+                      fontFamily: 'PublicPixel',
                       fontSize: 12,
                     ),
                   ),
@@ -244,7 +273,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     password.isEmpty ? 'Password' : '•' * password.length,
                     style: TextStyle(
                       color: password.isEmpty ? Colors.grey[600] : Colors.black,
-                      fontFamily: 'monospace',
+                      fontFamily: 'PublicPixel',
                       fontSize: 12,
                     ),
                   ),
@@ -275,7 +304,7 @@ class _LoginScreenState extends State<LoginScreen> {
               style: TextStyle(
                 color: selectedField == 2 ? Colors.black : Colors.white,
                 fontWeight: FontWeight.bold,
-                fontFamily: 'monospace',
+                fontFamily: 'PublicPixel',
                 fontSize: 14,
               ),
             ),
@@ -302,7 +331,7 @@ class _LoginScreenState extends State<LoginScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.black87,
-                fontFamily: 'monospace',
+                fontFamily: 'PublicPixel',
                 fontSize: 10,
                 decoration: TextDecoration.underline,
               ),

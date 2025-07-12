@@ -122,7 +122,7 @@ class GameboyProfileCardState extends State<GameboyProfileCard> with SingleTicke
                             padding: const EdgeInsets.symmetric(vertical: 2.0),
                             child: Text(
                               '• $item',
-                              style: const TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.white, fontFamily: 'PublicPixel'),
                             ),
                           )),
                     ],
@@ -160,7 +160,7 @@ class GameboyProfileCardState extends State<GameboyProfileCard> with SingleTicke
                       '${widget.name}, ${widget.age}',
                       style: const TextStyle(
                         color: Colors.white,
-                        fontFamily: 'monospace',
+                        fontFamily: 'PublicPixel',
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                         shadows: [

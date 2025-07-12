@@ -47,7 +47,7 @@ class GameboyScreen extends StatelessWidget {
                   'Profile Content',
                   style: TextStyle(
                     color: Colors.black,
-                    fontFamily: 'monospace',
+                    fontFamily: 'PublicPixel',
                     fontSize: 18,
                   ),
                 ),

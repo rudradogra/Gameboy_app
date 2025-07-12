@@ -20,7 +20,7 @@ class GameboyLogo extends StatelessWidget {
         'GAME BOY',
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontFamily: 'monospace',
+          fontFamily: 'PublicPixel',
           fontWeight: FontWeight.bold,
           fontSize: 18,
           color: Colors.grey[200],

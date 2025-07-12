@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'grainy_texture.dart';
 
 class GameboyButton extends StatelessWidget {
   final String label;
@@ -13,41 +14,50 @@ class GameboyButton extends StatelessWidget {
 
     return GestureDetector(
       onTap: onPressed,
-      child: Container(
-        width: 50,
-        height: 50,
-        decoration: BoxDecoration(
-          color: isEnabled ? Colors.black87 : Colors.grey[600],
-          shape: BoxShape.circle,
-          boxShadow: isEnabled
-              ? [
-                  BoxShadow(
-                    color: Colors.black54,
-                    blurRadius: 6,
-                    offset: Offset(3, 3),
-                  ),
-                  BoxShadow(
-                    color: Colors.white24,
-                    blurRadius: 2,
-                    offset: Offset(-1, -1),
-                  ),
-                ]
-              : [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 3,
+      child: GrainyContainer(
+        color: isEnabled ? Colors.black87 : Colors.grey[600]!,
+        borderRadius: BorderRadius.circular(25), // Circular shape
+        intensity: 0.3,
+        seed: label.hashCode, // Use label hash for consistent grain per button
+        boxShadow: isEnabled
+            ? [
+                BoxShadow(
+                  color: Colors.black54,
+                  blurRadius: 6,
+                  offset: Offset(3, 3),
+                ),
+                BoxShadow(
+                  color: Colors.white24,
+                  blurRadius: 2,
+                  offset: Offset(-1, -1),
+                ),
+              ]
+            : [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 3,
+                  offset: Offset(1, 1),
+                ),
+              ],
+        child: Container(
+          width: 50,
+          height: 50,
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: isEnabled ? Colors.white : Colors.grey[400],
+                fontWeight: FontWeight.bold,
+                fontSize: 22,
+                fontFamily: 'PublicPixel',
+                shadows: [
+                  Shadow(
                     offset: Offset(1, 1),
+                    blurRadius: 2,
+                    color: Colors.black,
                   ),
                 ],
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              color: isEnabled ? Colors.white : Colors.grey[400],
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
-              fontFamily: 'monospace',
+              ),
             ),
           ),
         ),

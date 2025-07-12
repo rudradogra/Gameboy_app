@@ -8,6 +8,7 @@ import '../widgets/gameboy_logo.dart';
 import '../widgets/gameboy_profile_card.dart';
 import '../widgets/gameboy_controls_popup.dart';
 import '../widgets/gameboy_action_popup.dart';
+import '../widgets/grainy_texture.dart';
 import 'login_screen.dart';
 import 'edit_profile_screen.dart';
 
@@ -111,16 +112,22 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Color(0xFF8B0000),
         title: Text(
           'Logout',
-          style: TextStyle(color: Colors.white, fontFamily: 'monospace'),
+          style: TextStyle(color: Colors.white, fontFamily: 'PublicPixel'),
         ),
         content: Text(
           'Are you sure you want to logout?',
-          style: TextStyle(color: Colors.white70, fontFamily: 'monospace'),
+          style: TextStyle(color: Colors.white70, fontFamily: 'PublicPixel'),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: TextStyle(color: Colors.white70)),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: Colors.white70,
+                fontFamily: 'PublicPixel',
+              ),
+            ),
           ),
           TextButton(
             onPressed: () {
@@ -130,7 +137,13 @@ class _HomePageState extends State<HomePage> {
                 MaterialPageRoute(builder: (context) => const LoginScreen()),
               );
             },
-            child: Text('Logout', style: TextStyle(color: Colors.cyanAccent)),
+            child: Text(
+              'Logout',
+              style: TextStyle(
+                color: Colors.cyanAccent,
+                fontFamily: 'PublicPixel',
+              ),
+            ),
           ),
         ],
       ),
@@ -156,18 +169,18 @@ class _HomePageState extends State<HomePage> {
       body: Center(
         child: AspectRatio(
           aspectRatio: 2 / 3.7, // Slightly taller for realism
-          child: Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFF8B0000),
-              borderRadius: BorderRadius.circular(40),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.cyanAccent.withOpacity(0.3),
-                  blurRadius: 20,
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
+          child: GrainyContainer(
+            color: const Color(0xFF8B0000),
+            borderRadius: BorderRadius.circular(40),
+            intensity: 0.25,
+            seed: 12345,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.cyanAccent.withOpacity(0.3),
+                blurRadius: 20,
+                spreadRadius: 2,
+              ),
+            ],
             child: Stack(
               children: [
                 // Main column for vertical layout
