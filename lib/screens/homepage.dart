@@ -7,6 +7,7 @@ import '../widgets/gameboy_speaker_dots.dart';
 import '../widgets/gameboy_logo.dart';
 import '../widgets/gameboy_profile_card.dart';
 import '../widgets/gameboy_controls_popup.dart';
+import '../widgets/gameboy_action_popup.dart';
 import 'login_screen.dart';
 import 'edit_profile_screen.dart';
 
@@ -62,34 +63,37 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _handleSuperlike() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Superliked ${profiles[currentProfileIndex]['name']}! 💖✨'),
-        backgroundColor: Colors.purple,
-        duration: Duration(seconds: 1),
-      ),
+    GameboyActionPopup.show(
+      context,
+      title: 'SUPERLIKE!',
+      message: '${profiles[currentProfileIndex]['name']}\nSUPERLIKED!',
+      backgroundColor: Colors.amber,
+      icon: Icons.star,
+      duration: Duration(milliseconds: 500),
     );
     _nextProfile();
   }
 
   void _handleLike() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Liked ${profiles[currentProfileIndex]['name']}! 💖'),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 1),
-      ),
+    GameboyActionPopup.show(
+      context,
+      title: 'LIKED!',
+      message: '${profiles[currentProfileIndex]['name']}\nLIKED!',
+      backgroundColor: Colors.green,
+      icon: Icons.favorite,
+      duration: Duration(milliseconds: 500),
     );
     _nextProfile();
   }
 
   void _handlePass() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Passed on ${profiles[currentProfileIndex]['name']}'),
-        backgroundColor: Colors.orange,
-        duration: Duration(seconds: 1),
-      ),
+    GameboyActionPopup.show(
+      context,
+      title: 'PASSED',
+      message: '${profiles[currentProfileIndex]['name']}\nPASSED',
+      backgroundColor: Colors.redAccent,
+      icon: Icons.close,
+      duration: Duration(milliseconds: 500),
     );
     _nextProfile();
   }
@@ -268,10 +272,7 @@ class _HomePageState extends State<HomePage> {
                             },
                           ),
                           const SizedBox(width: 24),
-                          GameboyPillButton(
-                            label: 'START',
-                            onPressed: _logout,
-                          ),
+                          GameboyPillButton(label: 'START', onPressed: _logout),
                         ],
                       ),
                     ),
