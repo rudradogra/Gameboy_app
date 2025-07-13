@@ -157,24 +157,3 @@ flutter run
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **Nintendo GameBoy** - Inspiration for the iconic design
-- **Flutter Team** - Amazing cross-platform framework
-- **Supabase** - Excellent backend-as-a-service platform
-- **Community** - Open source packages and resources
-
-## 📞 Support
-
-For support, email your-email@example.com or create an issue in the GitHub repository.
-
----
-
-<div align="center">
-
-**Built with ❤️ and nostalgia for the golden age of handheld gaming**
-
-[Report Bug](https://github.com/your-username/gameboy-dating-app/issues) • [Request Feature](https://github.com/your-username/gameboy-dating-app/issues) • [Documentation](https://github.com/your-username/gameboy-dating-app/wiki)
-
-</div>
