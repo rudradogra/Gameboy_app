@@ -9,7 +9,6 @@ import '../widgets/gameboy_profile_card.dart';
 import '../widgets/gameboy_controls_popup.dart';
 import '../widgets/gameboy_action_popup.dart';
 import '../widgets/grainy_texture.dart';
-import '../services/gameboy_sound.dart';
 import 'login_screen.dart';
 import 'edit_profile_screen.dart';
 

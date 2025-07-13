@@ -7,7 +7,6 @@ import '../widgets/gameboy_speaker_dots.dart';
 import '../widgets/gameboy_logo.dart';
 import '../widgets/gameboy_controls_popup.dart';
 import '../widgets/gameboy_action_popup.dart';
-import '../widgets/grainy_texture.dart';
 import '../services/api_service.dart';
 import '../services/gameboy_sound.dart';
 import 'register_screen.dart';
