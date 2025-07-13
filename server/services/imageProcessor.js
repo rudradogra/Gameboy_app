@@ -1,9 +1,11 @@
 const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs').promises;
+const { supabase, supabaseAdmin } = require('../config/supabase');
 
 class ImageProcessor {
   constructor() {
+    this.bucketName = 'profile-images';
     this.outputDir = path.join(__dirname, '../uploads/processed');
     this.inputDir = path.join(__dirname, '../uploads/images');
   }
@@ -16,21 +18,87 @@ class ImageProcessor {
     }
   }
 
-  async convertToRetro8Bit(inputPath, outputFilename, size = 200) {
-    await this.ensureDirectoryExists(this.outputDir);
-    
-    const outputPath = path.join(this.outputDir, outputFilename);
-    
+  async uploadToSupabase(buffer, filename, contentType = 'image/png') {
     try {
+      console.log(`📤 Uploading ${filename} to Supabase storage...`);
+      console.log(`📊 Buffer size: ${buffer.length} bytes`);
+      console.log(`🏷️ Content type: ${contentType}`);
+      
+      const { data, error } = await supabaseAdmin.storage
+        .from(this.bucketName)
+        .upload(filename, buffer, {
+          contentType,
+          upsert: true // Allow overwriting existing files
+        });
+
+      if (error) {
+        console.error('❌ Supabase upload error:', error);
+        throw new Error(`Failed to upload to Supabase: ${error.message}`);
+      }
+
+      console.log(`✅ Successfully uploaded to Supabase: ${filename}`);
+      console.log(`📁 Upload data:`, data);
+      
+      // Verify the file was uploaded by checking if it exists
+      const fileExists = await this.verifySupabaseFile(filename);
+      if (!fileExists) {
+        console.error('❌ File not found after upload!');
+        throw new Error('File upload verification failed');
+      }
+      
+      const publicUrl = this.getSupabaseImageUrl(filename);
+      console.log(`🌐 Public URL: ${publicUrl}`);
+      
+      return data;
+    } catch (error) {
+      console.error('💥 Supabase upload exception:', error);
+      throw error;
+    }
+  }
+
+  getSupabaseImageUrl(filename) {
+    const { data: { publicUrl } } = supabase.storage
+      .from(this.bucketName)
+      .getPublicUrl(filename);
+    
+    console.log(`🔗 Generated public URL for ${filename}: ${publicUrl}`);
+    return publicUrl;
+  }
+
+  async verifySupabaseFile(filename) {
+    try {
+      console.log(`🔍 Verifying file exists in Supabase: ${filename}`);
+      
+      const { data, error } = await supabaseAdmin.storage
+        .from(this.bucketName)
+        .list('', {
+          search: filename
+        });
+
+      if (error) {
+        console.error('❌ Error checking file:', error);
+        return false;
+      }
+
+      const fileExists = data && data.some(file => file.name === filename);
+      console.log(`📄 File ${filename} exists: ${fileExists}`);
+      return fileExists;
+    } catch (error) {
+      console.error('💥 Error verifying file:', error);
+      return false;
+    }
+  }
+
+  async convertToRetro8Bit(inputPath, outputFilename, size = 200) {
+    try {
+      console.log(`🎨 Processing 8-bit retro image: ${outputFilename}`);
+      
       // Create authentic 8-bit retro effect with enhanced pixelation and vibrant colors
-      const pipeline = sharp(inputPath)
+      const processedBuffer = await sharp(inputPath)
         .resize(size, size, { 
           fit: 'cover',
           position: 'center'
-        });
-
-      // Apply color enhancement and pixelation
-      await pipeline
+        })
         // Enhance saturation for more vibrant RGB colors
         .modulate({
           saturation: 1.8, // Boost saturation for vivid retro colors
@@ -46,10 +114,13 @@ class ImageProcessor {
           dither: 0.3, // Reduced dither for cleaner pixel blocks
           compressionLevel: 0 // No compression to maintain sharp pixels
         })
-        .toFile(outputPath);
+        .toBuffer();
 
-      console.log(`✅ 8-bit retro image processed successfully: ${outputFilename}`);
-      return outputPath;
+      // Upload to Supabase storage
+      await this.uploadToSupabase(processedBuffer, outputFilename, 'image/png');
+      
+      console.log(`✅ 8-bit retro image processed and uploaded: ${outputFilename}`);
+      return this.getSupabaseImageUrl(outputFilename);
     } catch (error) {
       console.error('❌ Error processing 8-bit retro image:', error);
       throw new Error(`8-bit retro processing failed: ${error.message}`);
@@ -69,18 +140,35 @@ class ImageProcessor {
   async deleteFile(filePath) {
     try {
       await fs.unlink(filePath);
-      console.log(`🗑️ Deleted file: ${filePath}`);
+      console.log(`🗑️ Deleted local file: ${filePath}`);
     } catch (error) {
-      console.warn(`⚠️ Could not delete file ${filePath}: ${error.message}`);
+      console.warn(`⚠️ Could not delete local file ${filePath}: ${error.message}`);
+    }
+  }
+
+  async deleteFromSupabase(filename) {
+    try {
+      console.log(`🗑️ Deleting from Supabase: ${filename}`);
+      
+      const { error } = await supabaseAdmin.storage
+        .from(this.bucketName)
+        .remove([filename]);
+
+      if (error) {
+        console.error('❌ Supabase delete error:', error);
+        throw new Error(`Failed to delete from Supabase: ${error.message}`);
+      }
+
+      console.log(`✅ Successfully deleted from Supabase: ${filename}`);
+    } catch (error) {
+      console.error('💥 Supabase delete exception:', error);
+      throw error;
     }
   }
 
   getProcessedImageUrl(filename) {
-    // Return full URL that will pass backend validation
-    const baseUrl = process.env.NODE_ENV === 'production' 
-      ? process.env.BASE_URL || 'https://your-domain.com'
-      : 'http://localhost:3000';
-    return `${baseUrl}/api/images/${filename}`;
+    // Return Supabase public URL for cloud storage
+    return this.getSupabaseImageUrl(filename);
   }
 }
 

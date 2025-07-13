@@ -323,4 +323,25 @@ class ImageUploadService {
   static String getImageUrl(String filename) {
     return '$baseUrl/images/$filename';
   }
+
+  // Validate Supabase URL format
+  static bool isValidSupabaseUrl(String? url) {
+    if (url == null || url.isEmpty) return false;
+
+    try {
+      final uri = Uri.parse(url);
+      // Check if it's a Supabase storage URL
+      return uri.host.contains('supabase.co') ||
+          uri.host.contains('supabase.in') ||
+          _isValidLocalUrl(url); // Still support local URLs for development
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Check if the URL is a valid local URL (for development)
+  static bool _isValidLocalUrl(String url) {
+    return url.startsWith('http://10.0.2.2') ||
+        url.startsWith('http://localhost');
+  }
 }

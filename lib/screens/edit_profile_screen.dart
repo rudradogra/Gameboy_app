@@ -307,7 +307,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         fit: BoxFit.cover,
                         filterQuality: FilterQuality.none, // Pixelated display
                         loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
+                          if (loadingProgress == null) {
+                            print(
+                              '✅ Successfully loaded image: $currentImageUrl',
+                            );
+                            return child;
+                          }
+                          print(
+                            '⏳ Loading image: $currentImageUrl (${loadingProgress.cumulativeBytesLoaded}/${loadingProgress.expectedTotalBytes})',
+                          );
                           return Container(
                             color: Colors.grey[800],
                             child: Center(
@@ -323,12 +331,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           );
                         },
                         errorBuilder: (context, error, stackTrace) {
+                          print('❌ Error loading image: $currentImageUrl');
+                          print('❌ Error details: $error');
                           return Container(
                             color: Colors.grey[800],
-                            child: Icon(
-                              Icons.error,
-                              color: Colors.red,
-                              size: 24,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.broken_image,
+                                  color: Colors.red,
+                                  size: 24,
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  'Failed to load',
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontFamily: 'PublicPixel',
+                                    fontSize: 4,
+                                  ),
+                                ),
+                              ],
                             ),
                           );
                         },
@@ -485,13 +509,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           imageFile,
         );
 
+        print('🔍 Full preview result: $previewResult');
+
         if (previewResult['success']) {
+          final previewUrl = previewResult['data']['previewUrl'];
+          print('🔍 Preview URL from backend: $previewUrl');
+
           setState(() {
             _selectedImages[imageIndex] = imageFile;
-            _previewUrls[imageIndex] = ImageUploadService.getImageUrl(
-              previewResult['data']['filename'],
-            );
+            // Use the full previewUrl directly from the backend response
+            _previewUrls[imageIndex] = previewUrl;
           });
+
+          print('✅ Preview URL set: $previewUrl');
 
           GameBoySound.playSuccess();
           GameboyActionPopup.show(
@@ -1103,8 +1133,53 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     _previewUrls[index]!,
                     fit: BoxFit.cover,
                     filterQuality: FilterQuality.none, // Pixelated display
-                    errorBuilder: (context, error, stackTrace) =>
-                        Icon(Icons.error, size: 12, color: Colors.red),
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) {
+                        print(
+                          '✅ Successfully loaded preview: ${_previewUrls[index]}',
+                        );
+                        return child;
+                      }
+                      print('⏳ Loading preview: ${_previewUrls[index]}');
+                      return Container(
+                        color: Colors.grey[800],
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 1,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.cyanAccent,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      print(
+                        '❌ Error loading preview image: ${_previewUrls[index]}',
+                      );
+                      print('❌ Preview error details: $error');
+                      return Container(
+                        color: Colors.grey[800],
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.broken_image,
+                              size: 8,
+                              color: Colors.red,
+                            ),
+                            Text(
+                              'Error',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontFamily: 'PublicPixel',
+                                fontSize: 3,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),

@@ -227,12 +227,26 @@ router.put('/me', authenticateToken, [
   body('age').optional().isInt({ min: 18, max: 99 }).withMessage('Age must be between 18 and 99'),
   body('location').optional().isLength({ max: 100 }).withMessage('Location must be less than 100 characters'),
   body('images').optional().isArray().withMessage('Images must be an array'),
-  body('images.*').optional().isURL({
-    protocols: ['http', 'https'],
-    require_protocol: true,
-    allow_underscores: true,
-    host_whitelist: ['localhost', '127.0.0.1', '10.0.2.2'] // Allow local development URLs
-  }).withMessage('Each image must be a valid URL'),
+  body('images.*').optional().custom((value) => {
+    try {
+      const url = new URL(value);
+      // Allow localhost for development
+      if (['localhost', '127.0.0.1', '10.0.2.2'].includes(url.hostname)) {
+        return true;
+      }
+      // Allow Supabase storage URLs
+      if (url.hostname.endsWith('.supabase.co')) {
+        return true;
+      }
+      // Allow any HTTPS URL for production
+      if (url.protocol === 'https:') {
+        return true;
+      }
+      throw new Error('Invalid URL');
+    } catch (error) {
+      throw new Error('Each image must be a valid URL');
+    }
+  }),
   body('interests').optional().isArray().withMessage('Interests must be an array'),
   body('name').optional().notEmpty().withMessage('Name cannot be empty')
 ], async (req, res) => {
