@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Allow cleartext traffic for development and ensure HTTPS works properly -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">railway.app</domain>
+        <domain includeSubdomains="true">up.railway.app</domain>
+        <domain includeSubdomains="true">gameboyappbackend-production.up.railway.app</domain>
+    </domain-config>
+    
+    <!-- Default configuration for other domains -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system"/>
+        </trust-anchors>
+    </base-config>
+</network-security-config>

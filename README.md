@@ -1,159 +1,89 @@
-# 🎮 GameBoy Tinder - Retro Dating App
-
 <div align="center">
+<h1>🎮 GameBoy Dating App</h1>
 
 ![GameBoy Style Dating App](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
 ![Node.js Backend](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
 ![Supabase Database](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
+![Railway Deployment](https://img.shields.io/badge/Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)
 
-*A nostalgic dating app that brings the classic GameBoy experience to modern mobile dating*
+*Step into the past with the future of dating - A fully functional GameBoy-themed dating app with an authentic retro experience*
+
+[🎥 Demo Video](https://github.com/your-repo/demo) | [📱 Download APK](https://github.com/your-repo/releases)
 
 </div>
 
-## 📖 Overview
 
-GameBoy Tinder is a unique mobile dating application that recreates the iconic GameBoy handheld gaming experience. Users navigate through profiles using authentic GameBoy controls (D-pad, A/B buttons) while enjoying retro aesthetics, grainy textures, and authentic 8-bit sound effects.
 
-### ✨ Key Features
+---
 
-- 🎮 **Authentic GameBoy Interface** - Complete with D-pad navigation, A/B buttons, and classic design
-- 🔊 **Retro Sound Effects** - Authentic button clicks and navigation sounds
-- 🖥️ **Grainy Texture System** - Realistic CRT-style visual effects for true retro feel
-- 👤 **Profile Matching** - Swipe through profiles using GameBoy controls
-- 🔐 **Secure Authentication** - JWT-based login/registration system
-- 📱 **Cross-Platform** - Built with Flutter for iOS, Android, and Web
-- 🗄️ **Robust Backend** - Node.js + Supabase for scalable data management
+🌟 What Is It?
 
-## 🏗️ Architecture
+GameBoy Dating App is a nostalgic twist on modern dating. Imagine Tinder, but inside a fully functional GameBoy interface — pixelated profiles, tactile D-pad navigation, crunchy button sounds, and a heart-based liking system. All wrapped in authentic 8-bit vibes.
 
-### Frontend (Flutter)
+---
+
+🧩 Key Features
+
+🎮 GameBoy Interface
+- Exact GameBoy design: D-pad, A/B buttons, screen glow
+- Fully interactive UI mimicking a handheld console
+
+🧡 Heart-Based Matching
+- Start with 10 hearts per session
+- Like = 0.5 ❤️, Superlike = 1 ❤️
+- Adds strategic and gamified behavior to swiping
+
+🖼️ Retro Image Processing
+- Uploaded photos are transformed into pixelated 8-bit avatars
+- Uses only 8 basic RGB colors: red, green, blue, black, white, yellow, cyan, magenta
+
+🔊 Sound & Feedback
+- Every click and move plays authentic GameBoy sounds
+- Haptic and visual feedback just like an old-school console
+
+📸 Profile Gallery
+- Swipe through user images like a slideshow
+- View bios with ↓ and toggle profile info on demand
+
+---
+
+## 🛠️ Tech Behind the Magic
+
+| **Layer**           | **Stack**                                                                                         | **Description** |
+|---------------------|---------------------------------------------------------------------------------------------------|------------------|
+| **Frontend**         | `Flutter` (Android, Web, iOS) + Custom GameBoy UI                                                 | Built with Flutter for true cross-platform support. The GameBoy interface is fully recreated with custom widgets, retro typography, D-pad controls, and smooth animations. |
+| **Backend**          | `Node.js` + `Express.js`                                                                          | Handles user authentication, profile management, image uploads, and match logic. Cleanly structured with RESTful APIs. |
+| **Auth & Database**  | `Supabase` (PostgreSQL + JWT Auth)                                                                | Supabase provides scalable authentication and database services. Stores user profiles, image URLs, and matches, all secured with JWT tokens. |
+| **Image Pixelation** | `sharp` (Node.js image processing library)                                                        | Converts uploaded profile photos into pixelated retro-style images with reduced resolution and a strict 8-color RGB palette. Uses nearest-neighbor scaling to maintain crisp pixels. |
+| **Hosting & Deployment** | `Railway` (backend server), `Supabase` (database & file storage) | The backend is deployed on Railway. Supabase handles real-time database and file storage. |
+
+---
+
+🔧 Local Setup (Dev Only)
+1.	Clone the repo
 ```
-lib/
-├── main.dart                 # App entry point with sound initialization
-├── screens/                  # Main application screens
-│   ├── login_screen.dart     # GameBoy-themed login interface
-│   ├── register_screen.dart  # Registration with retro styling
-│   └── homepage.dart         # Profile browsing interface
-├── widgets/                  # Reusable GameBoy components
-│   ├── gameboy_screen.dart   # Classic GameBoy screen simulation
-│   ├── gameboy_dpad.dart     # D-pad navigation control
-│   ├── gameboy_button.dart   # A/B button components
-│   ├── grainy_texture.dart   # Retro texture system
-│   └── gameboy_*.dart        # Additional UI components
-└── services/                 # Business logic and integrations
-    ├── api_service.dart      # Backend API communication
-    └── gameboy_sound.dart    # Retro sound system
-```
-
-### Backend (Node.js + Supabase)
-```
-server/
-├── server.js                 # Express server configuration
-├── config/
-│   └── supabase.js          # Database connection setup
-├── routes/                   # API endpoint definitions
-│   ├── auth.js              # Authentication endpoints
-│   ├── users.js             # User management
-│   ├── profiles.js          # Profile operations
-│   └── matches.js           # Matching logic
-├── middleware/               # Custom middleware
-│   └── auth.js              # JWT authentication
-└── database_setup.sql       # Database schema
-```
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- **Flutter SDK** (≥3.8.1)
-- **Node.js** (≥18.0.0)
-- **Supabase Account** (for database)
-- **iOS Simulator** or **Android Emulator**
-
-### 🔧 Installation
-
-#### 1. Clone the Repository
-```bash
-git clone https://github.com/your-username/gameboy-dating-app.git
-cd gameboy-dating-app
+git clone https://github.com/rudradogra/Gameboy_app.git
 ```
 
-#### 2. Backend Setup
-```bash
+2.	Backend Setup
+```
 cd server
 npm install
-```
-
-Create `.env` file in server directory:
-```env
-PORT=3000
-SUPABASE_URL=your_supabase_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-JWT_SECRET=your_jwt_secret_key
-```
-
-Set up database:
-```bash
-# Run the database setup script
-node setup-db.js
-```
-
-Start the backend server:
-```bash
 npm run dev
 ```
 
-#### 3. Frontend Setup
-```bash
-cd ..  # Back to root directory
+3.	Frontend (Flutter)
+```
+cd ..
 flutter pub get
-```
-
-Update API endpoint in `lib/services/api_service.dart`:
-```dart
-static const String baseUrl = 'http://your-server-url:3000/api';
-```
-
-Run the Flutter app:
-```bash
 flutter run
 ```
 
-## 🎮 Usage Guide
 
-### Navigation Controls
-
-| Control | Action |
-|---------|--------|
-| **D-Pad ↑↓** | Navigate menu items |
-| **D-Pad ←→** | Change profile images |
-| **A Button** | Select/Confirm action |
-| **B Button** | Back/Cancel |
-| **SELECT** | Show controls menu |
-| **START** | Logout/Settings |
-
-### Features Walkthrough
-
-#### 🔐 Authentication
-- **Login/Register** with GameBoy-themed interface
-- **D-pad navigation** through form fields
-- **Sound feedback** for success/error states
-- **Secure JWT authentication**
-
-#### 👤 Profile Browsing
-- **Navigate profiles** using D-pad left/right
-- **View multiple images** per profile
-- **Like/Pass decisions** with A/B buttons
-- **Profile information toggle** with CENTER button
-
-#### 🔊 Sound System
-- **Button clicks** - Authentic GameBoy button sounds
-- **Navigation** - Lighter D-pad movement sounds
-- **Success/Error** - Contextual audio feedback
-- **Sound toggle** - Enable/disable via controls menu
+---
+<div align="center">
 
 
-## 📝 License
+Built with ❤️ and nostalgia for a new generation of retro lovers
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+</div>
