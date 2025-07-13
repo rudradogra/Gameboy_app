@@ -325,7 +325,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             color: Colors.grey[800],
-                            child: Icon(Icons.error, color: Colors.red, size: 24),
+                            child: Icon(
+                              Icons.error,
+                              color: Colors.red,
+                              size: 24,
+                            ),
                           );
                         },
                       ),

@@ -85,7 +85,8 @@ class GameboyProfileCardState extends State<GameboyProfileCard>
             child: Image.network(
               widget.imageUrl[widget.currentImageIndex],
               fit: BoxFit.cover,
-              filterQuality: FilterQuality.none, // Pixelated display for retro look
+              filterQuality:
+                  FilterQuality.none, // Pixelated display for retro look
               errorBuilder: (context, error, stackTrace) => Container(
                 color: Colors.grey[300],
                 child: Icon(Icons.person, color: Colors.grey[600], size: 60),
