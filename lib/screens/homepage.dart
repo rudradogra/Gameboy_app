@@ -27,6 +27,8 @@ class _HomePageState extends State<HomePage> {
   bool showProfileInfo = false;
   bool isLoading = true;
   bool isPerformingAction = false;
+  int likesCount = 0; // Track total likes
+  bool isOutOfLikes = false; // Track if user has used all likes
 
   List<Map<String, dynamic>> profiles = [];
 
@@ -173,10 +175,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _handleSuperlike() async {
-    if (isPerformingAction || profiles.isEmpty) return;
+    if (isPerformingAction || profiles.isEmpty || isOutOfLikes) return;
 
     setState(() {
       isPerformingAction = true;
+      likesCount += 2; // Count superlike as 2 likes
     });
 
     try {
@@ -227,14 +230,56 @@ class _HomePageState extends State<HomePage> {
         isPerformingAction = false;
       });
       _nextProfile();
+
+      // Check if 10 likes have been used
+      if (likesCount >= 10) {
+        setState(() {
+          isOutOfLikes = true;
+        });
+        
+        // Show out of likes popup with options
+        GameboyActionPopup.show(
+          context,
+          'Out of Likes',
+          message: 'You\'ve used all your likes!\nWhat would you like to do?',
+          backgroundColor: Colors.red,
+          icon: Icons.favorite_border,
+          duration: Duration(seconds: 2),
+          onDismiss: () {
+            // Show options popup
+            GameboyActionPopup.show(
+              context,
+              'Options',
+              message: '',
+              backgroundColor: const Color.fromARGB(255, 64, 64, 64),
+              icon: Icons.person,
+              onDismiss: () {
+                GameboyPillButton(
+                  label: 'Log Out',
+                  onPressed: () {
+                    _logout();
+                  },
+                );
+                GameboyPillButton(
+                  label: 'Edit Profile',
+                  onPressed: () {
+                    _editProfile();
+                  },
+                );
+              },
+            );
+          },
+        );
+      }
     }
   }
 
   void _handleLike() async {
-    if (isPerformingAction || profiles.isEmpty) return;
+    if (isPerformingAction || profiles.isEmpty || isOutOfLikes) return;
 
     setState(() {
       isPerformingAction = true;
+      likesCount++; // Increment likes count
     });
 
     try {
@@ -285,6 +330,47 @@ class _HomePageState extends State<HomePage> {
         isPerformingAction = false;
       });
       _nextProfile();
+
+      // Check if 10 likes have been used
+      if (likesCount >= 10) {
+        setState(() {
+          isOutOfLikes = true;
+        });
+        
+        // Show out of likes popup with options
+        GameboyActionPopup.show(
+          context,
+          'Out of Likes',
+          message: 'You\'ve used all your likes!\nWhat would you like to do?',
+          backgroundColor: Colors.red,
+          icon: Icons.favorite_border,
+          duration: Duration(seconds: 2),
+          onDismiss: () {
+            // Show options popup
+            GameboyActionPopup.show(
+              context,
+              'Options',
+              message: '',
+              backgroundColor: const Color.fromARGB(255, 78, 78, 78),
+              icon: Icons.person,
+              onDismiss: () {
+                GameboyPillButton(
+                  label: 'Log Out',
+                  onPressed: () {
+                    _logout();
+                  },
+                );
+                GameboyPillButton(
+                  label: 'Edit Profile',
+                  onPressed: () {
+                    _editProfile();
+                  },
+                );
+              },
+            );
+          },
+        );
+      }
     }
   }
 

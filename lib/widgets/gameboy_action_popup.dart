@@ -8,6 +8,7 @@ class GameboyActionPopup {
     required Color backgroundColor,
     required IconData icon,
     Duration duration = const Duration(milliseconds: 500),
+    VoidCallback? onDismiss,
   }) {
     showDialog(
       context: context,
@@ -20,6 +21,8 @@ class GameboyActionPopup {
           if (context.mounted &&
               Navigator.of(context, rootNavigator: true).canPop()) {
             Navigator.of(context, rootNavigator: true).pop();
+            // Call onDismiss callback if provided
+            onDismiss?.call();
           }
         });
 
