@@ -8,11 +8,16 @@ const router = express.Router();
 // Get all profiles for discovery (excluding current user)
 router.get('/discover', authenticateToken, async (req, res) => {
   try {
+    console.log('🔍 Discovery endpoint called by user:', req.user.id);
+    
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
 
+    console.log(`📊 Discovery params - page: ${page}, limit: ${limit}, offset: ${offset}`);
+
     // Get profiles that the current user hasn't interacted with yet
+    console.log('🗄️ Fetching profiles from database...');
     const { data: profiles, error } = await supabaseAdmin
       .from('profiles')
       .select(`
@@ -24,20 +29,28 @@ router.get('/discover', authenticateToken, async (req, res) => {
       .range(offset, offset + limit - 1);
 
     if (error) {
-      console.error('Get profiles error:', error);
+      console.error('❌ Get profiles error:', error);
       return res.status(500).json({
         error: 'Failed to fetch profiles'
       });
     }
 
+    console.log(`✅ Found ${profiles?.length || 0} profiles before filtering`);
+    console.log('📋 Raw profiles data:', profiles?.map(p => ({ id: p.id, name: p.name, user_id: p.user_id })));
+
     // Filter out profiles that user has already liked/passed
+    console.log('🔍 Checking for previous interactions...');
     const { data: interactions } = await supabaseAdmin
       .from('matches')
       .select('user2_id')
       .eq('user1_id', req.user.id);
 
+    console.log(`📝 Found ${interactions?.length || 0} previous interactions:`, interactions?.map(i => i.user2_id));
+
     const interactedUserIds = new Set(interactions?.map(i => i.user2_id) || []);
     const filteredProfiles = profiles.filter(profile => !interactedUserIds.has(profile.user_id));
+
+    console.log(`✅ After filtering: ${filteredProfiles.length} profiles available`);
 
     res.json({
       profiles: filteredProfiles,
@@ -46,8 +59,10 @@ router.get('/discover', authenticateToken, async (req, res) => {
       total: filteredProfiles.length
     });
 
+    console.log('📤 Successfully sent discovery response');
+
   } catch (error) {
-    console.error('Discover profiles error:', error);
+    console.error('💥 Discover profiles error:', error);
     res.status(500).json({
       error: 'Failed to discover profiles'
     });
