@@ -17,7 +17,7 @@ class GameboyLogo extends StatelessWidget {
         ),
       ),
       child: Text(
-        'GAME BOY',
+        'SWIPE BOY',
         textAlign: TextAlign.center,
         style: TextStyle(
           fontFamily: 'PublicPixel',

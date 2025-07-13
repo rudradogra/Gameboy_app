@@ -5,13 +5,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImageUploadService {
-  // Use platform-specific URL for Android emulator vs iOS simulator
+  // Production server URL deployed on Railway
   static String get baseUrl {
-    if (Platform.isAndroid) {
-      return 'http://10.0.2.2:3000/api'; // Android emulator maps to host localhost
-    } else {
-      return 'http://localhost:3000/api'; // iOS simulator and other platforms
-    }
+    return 'https://gameboyappbackend-production.up.railway.app/api';
   }
 
   static final ImagePicker _picker = ImagePicker();
@@ -324,15 +320,17 @@ class ImageUploadService {
     return '$baseUrl/images/$filename';
   }
 
-  // Validate Supabase URL format
+  // Validate Supabase or Railway URL format
   static bool isValidSupabaseUrl(String? url) {
     if (url == null || url.isEmpty) return false;
 
     try {
       final uri = Uri.parse(url);
-      // Check if it's a Supabase storage URL
+      // Check if it's a Supabase storage URL or Railway deployment URL
       return uri.host.contains('supabase.co') ||
           uri.host.contains('supabase.in') ||
+          uri.host.contains('railway.app') ||
+          uri.host.contains('up.railway.app') ||
           _isValidLocalUrl(url); // Still support local URLs for development
     } catch (e) {
       return false;
