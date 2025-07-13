@@ -309,6 +309,72 @@ class ApiService {
     }
   }
 
+  // Get user's own profile
+  static Future<Map<String, dynamic>> getMyProfile() async {
+    try {
+      print('🌐 API: Starting get my profile request');
+      final headers = await getHeaders();
+      final url = '$baseUrl/profiles/me';
+      print('🎯 API: Request URL: $url');
+
+      final response = await http.get(Uri.parse(url), headers: headers);
+
+      print('📥 API: Profile response status: ${response.statusCode}');
+      return handleResponse(response);
+    } catch (e) {
+      print('💥 API: Get profile error: $e');
+      return {
+        'success': false,
+        'error': 'Network error',
+        'message': e.toString(),
+      };
+    }
+  }
+
+  // Update user profile
+  static Future<Map<String, dynamic>> updateProfile({
+    String? name,
+    String? bio,
+    int? age,
+    String? location,
+    List<String>? images,
+    List<String>? interests,
+  }) async {
+    try {
+      print('🌐 API: Starting update profile request');
+      final headers = await getHeaders();
+      final url = '$baseUrl/profiles/me';
+      print('🎯 API: Request URL: $url');
+
+      final bodyData = <String, dynamic>{};
+      if (name != null) bodyData['name'] = name;
+      if (bio != null) bodyData['bio'] = bio;
+      if (age != null) bodyData['age'] = age;
+      if (location != null) bodyData['location'] = location;
+      if (images != null) bodyData['images'] = images;
+      if (interests != null) bodyData['interests'] = interests;
+
+      final body = json.encode(bodyData);
+      print('📦 API: Request body: $body');
+
+      final response = await http.put(
+        Uri.parse(url),
+        headers: headers,
+        body: body,
+      );
+
+      print('📥 API: Update profile response status: ${response.statusCode}');
+      return handleResponse(response);
+    } catch (e) {
+      print('💥 API: Update profile error: $e');
+      return {
+        'success': false,
+        'error': 'Network error',
+        'message': e.toString(),
+      };
+    }
+  }
+
   // Get matches
   static Future<Map<String, dynamic>> getMatches({
     bool includeAll = false,

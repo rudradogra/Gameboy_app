@@ -8,6 +8,8 @@ import '../widgets/gameboy_logo.dart';
 import '../widgets/gameboy_profile_card.dart';
 import '../widgets/gameboy_controls_popup.dart';
 import '../widgets/gameboy_action_popup.dart';
+import '../services/api_service.dart';
+import '../services/gameboy_sound.dart';
 import '../widgets/grainy_texture.dart';
 import 'login_screen.dart';
 import 'edit_profile_screen.dart';
@@ -167,14 +169,113 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _editProfile() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-            EditProfileScreen(currentProfile: profiles[currentProfileIndex]),
-      ),
-    );
+  void _editProfile() async {
+    try {
+      print('🔄 Starting edit profile flow...');
+
+      // Fetch the logged-in user's profile
+      final result = await ApiService.getMyProfile();
+
+      if (result['success']) {
+        final userProfile = result['data']['profile'];
+        print('✅ Profile loaded successfully: ${userProfile['bio']}');
+
+        // Transform API response to expected format
+        final transformedProfile = {
+          'name': userProfile['name'] ?? '', // API might not have name field
+          'age': userProfile['age'],
+          'bio': userProfile['bio'],
+          'location': userProfile['location'],
+          'interests': userProfile['interests'] ?? [],
+          'imageUrls':
+              userProfile['image_urls'] ??
+              [], // Transform image_urls to imageUrls
+          'images':
+              userProfile['image_urls'] ??
+              [], // Also add images for backwards compatibility
+        };
+
+        // Navigate to edit screen with user's own profile
+        if (mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  EditProfileScreen(currentProfile: transformedProfile),
+            ),
+          ).then((updatedProfile) {
+            // Handle the returned updated profile if needed
+            if (updatedProfile != null) {
+              print('✅ Profile updated: $updatedProfile');
+              // You could refresh the homepage data here if needed
+            }
+          });
+        }
+      } else {
+        // Check if this is a "profile not found" error
+        final errorMessage = result['message'] ?? '';
+        final isProfileNotFound =
+            errorMessage.toLowerCase().contains('profile not found') ||
+            errorMessage.toLowerCase().contains('create your profile');
+
+        print('🔍 Error message: $errorMessage');
+        print('🔍 Is profile not found: $isProfileNotFound');
+
+        if (isProfileNotFound) {
+          // Profile doesn't exist yet - navigate directly to create profile
+          print('✅ Profile not found - navigating to create profile');
+          GameBoySound.playNavigation();
+
+          // Navigate to edit screen with empty profile data for creation
+          print('🧭 Navigating to create profile screen...');
+          if (mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EditProfileScreen(
+                  currentProfile: {
+                    'name': '',
+                    'age':
+                        null, // Changed from 18 to null so it shows placeholder
+                    'bio': '',
+                    'interests': <String>[],
+                    'profilePicture': null,
+                  },
+                ),
+              ),
+            ).then((updatedProfile) {
+              if (updatedProfile != null) {
+                print('✅ Profile created: $updatedProfile');
+              }
+            });
+          } else {
+            print('❌ Widget not mounted, skipping navigation');
+          }
+        } else {
+          // Other errors - show error message
+          GameBoySound.playError();
+          GameboyActionPopup.show(
+            context,
+            'Error',
+            message: errorMessage.isNotEmpty
+                ? errorMessage
+                : 'Failed to load profile',
+            backgroundColor: Colors.red,
+            icon: Icons.error,
+          );
+        }
+      }
+    } catch (e) {
+      print('💥 Edit profile error: $e');
+      GameBoySound.playError();
+      GameboyActionPopup.show(
+        context,
+        'Network Error',
+        message: 'Unable to connect to server',
+        backgroundColor: Colors.red,
+        icon: Icons.wifi_off,
+      );
+    }
   }
 
   @override

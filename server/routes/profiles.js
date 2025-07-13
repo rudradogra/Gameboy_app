@@ -109,6 +109,7 @@ router.post('/me', authenticateToken, [
     const { age, bio, interests, location, image_urls } = req.body;
 
     const profileData = {
+      name: req.body.name,
       user_id: req.user.id,
       age,
       bio: bio || '',
@@ -201,6 +202,117 @@ router.get('/:profileId', authenticateToken, async (req, res) => {
     console.error('Get profile by ID error:', error);
     res.status(500).json({
       error: 'Failed to fetch profile'
+    });
+  }
+});
+
+// Update user's own profile
+router.put('/me', authenticateToken, [
+  body('bio').optional().isLength({ max: 500 }).withMessage('Bio must be less than 500 characters'),
+  body('age').optional().isInt({ min: 18, max: 99 }).withMessage('Age must be between 18 and 99'),
+  body('location').optional().isLength({ max: 100 }).withMessage('Location must be less than 100 characters'),
+  body('images').optional().isArray().withMessage('Images must be an array'),
+  body('images.*').optional().isURL().withMessage('Each image must be a valid URL'),
+  body('interests').optional().isArray().withMessage('Interests must be an array'),
+  body('name').optional().notEmpty().withMessage('Name cannot be empty')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        error: 'Validation failed',
+        details: errors.array()
+      });
+    }
+
+    const { bio, age, location, images, interests, name } = req.body;
+    
+    // First check if profile exists
+    const { data: existingProfile } = await supabaseAdmin
+      .from('profiles')
+      .select('id')
+      .eq('user_id', req.user.id)
+      .single();
+
+    const updateData = {};
+    if (bio !== undefined) updateData.bio = bio;
+    if (age !== undefined) updateData.age = age;
+    if (location !== undefined) updateData.location = location;
+    if (images !== undefined) updateData.image_urls = images; // Map images to image_urls column
+    if (interests !== undefined) updateData.interests = interests;
+    if (name !== undefined) updateData.name = name; // Add name to profile update data
+    
+    updateData.updated_at = new Date().toISOString();
+
+    let profileResult;
+    
+    if (existingProfile) {
+      // Update existing profile
+      const { data: profile, error } = await supabaseAdmin
+        .from('profiles')
+        .update(updateData)
+        .eq('user_id', req.user.id)
+        .select(`
+          *,
+          users!profiles_user_id_fkey(username, name)
+        `)
+        .single();
+
+      if (error) {
+        console.error('Update profile error:', error);
+        return res.status(500).json({
+          error: 'Failed to update profile'
+        });
+      }
+      profileResult = profile;
+    } else {
+      // Create new profile
+      updateData.user_id = req.user.id;
+      updateData.is_active = true;
+
+      const { data: profile, error } = await supabaseAdmin
+        .from('profiles')
+        .insert([updateData])
+        .select(`
+          *,
+          users!profiles_user_id_fkey(username, name)
+        `)
+        .single();
+
+      if (error) {
+        console.error('Create profile error:', error);
+        return res.status(500).json({
+          error: 'Failed to create profile'
+        });
+      }
+      profileResult = profile;
+    }
+
+    // Update user name if provided
+    if (name !== undefined) {
+      const { error: userError } = await supabaseAdmin
+        .from('users')
+        .update({ 
+          name: name,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', req.user.id);
+
+      if (userError) {
+        console.error('Update user name error:', userError);
+        // Don't fail the request, just log the error
+      }
+    }
+
+    res.json({
+      message: 'Profile updated successfully',
+      profile: profileResult
+    });
+
+  } catch (error) {
+    console.error('Update profile error:', error);
+    res.status(500).json({
+      error: 'Failed to update profile'
     });
   }
 });

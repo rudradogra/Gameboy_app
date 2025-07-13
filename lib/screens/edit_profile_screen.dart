@@ -6,6 +6,9 @@ import '../widgets/gameboy_pill_button.dart';
 import '../widgets/gameboy_speaker_dots.dart';
 import '../widgets/gameboy_logo.dart';
 import '../widgets/gameboy_controls_popup.dart';
+import '../widgets/gameboy_action_popup.dart';
+import '../services/api_service.dart';
+import '../services/gameboy_sound.dart';
 import 'login_screen.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -21,25 +24,35 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _nameController;
   late TextEditingController _ageController;
-  late List<TextEditingController> _infoControllers;
+  late TextEditingController _bioController;
+  late TextEditingController _locationController;
   late List<TextEditingController> _imageControllers;
   int selectedField = 0;
   bool showImageInputs = false; // Toggle between profile info and image inputs
+  bool isLoading = false;
+  bool isSaving = false;
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(
-      text: widget.currentProfile['name'].split(', ')[0],
+      text: widget.currentProfile['name']?.toString().split(', ')[0] ?? '',
     );
     _ageController = TextEditingController(
-      text: widget.currentProfile['age'].toString(),
+      text:
+          (widget.currentProfile['age'] != null &&
+              widget.currentProfile['age'] != 0)
+          ? widget.currentProfile['age'].toString()
+          : '',
     );
-    _infoControllers = List.generate(
-      3,
-      (index) =>
-          TextEditingController(text: widget.currentProfile['info'][index]),
+    _bioController = TextEditingController(
+      text: widget.currentProfile['bio']?.toString() ?? '',
     );
+    _locationController = TextEditingController(
+      text: widget.currentProfile['location']?.toString() ?? '',
+    );
+
+    // Initialize image controllers
     _imageControllers = List.generate(
       3,
       (index) => TextEditingController(
@@ -48,6 +61,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 widget.currentProfile['imageUrls'] is List &&
                 (widget.currentProfile['imageUrls'] as List).length > index
             ? widget.currentProfile['imageUrls'][index]
+            : widget.currentProfile['images'] != null &&
+                  widget.currentProfile['images'] is List &&
+                  (widget.currentProfile['images'] as List).length > index
+            ? widget.currentProfile['images'][index]
             : '',
       ),
     );
@@ -57,9 +74,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void dispose() {
     _nameController.dispose();
     _ageController.dispose();
-    for (var controller in _infoControllers) {
-      controller.dispose();
-    }
+    _bioController.dispose();
+    _locationController.dispose();
     for (var controller in _imageControllers) {
       controller.dispose();
     }
@@ -74,14 +90,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               (selectedField - 1) % 4; // 3 image fields + 1 save button
           if (selectedField < 0) selectedField = 3;
         } else {
-          selectedField = (selectedField - 1) % 6; // 5 fields + 1 save button
-          if (selectedField < 0) selectedField = 5;
+          selectedField = (selectedField - 1) % 5; // 4 fields + 1 save button
+          if (selectedField < 0) selectedField = 4;
         }
       } else if (direction == 'down') {
         if (showImageInputs) {
           selectedField = (selectedField + 1) % 4;
         } else {
-          selectedField = (selectedField + 1) % 6;
+          selectedField = (selectedField + 1) % 5;
         }
       } else if (direction == 'left') {
         // Switch to profile info mode
@@ -107,7 +123,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _showEditDialog(selectedField);
       }
     } else {
-      if (selectedField == 5) {
+      if (selectedField == 4) {
         _saveChanges();
       } else {
         _showEditDialog(selectedField);
@@ -146,10 +162,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           currentValue = _ageController.text;
           keyboardType = TextInputType.number;
           break;
-        default:
-          title = 'Edit Info ${fieldIndex - 1}';
-          currentValue = _infoControllers[fieldIndex - 2].text;
-          maxLines = 2;
+        case 2:
+          title = 'Edit Bio';
+          currentValue = _bioController.text;
+          keyboardType = TextInputType.multiline;
+          maxLines = 4;
+          break;
+        case 3:
+          title = 'Edit Location';
+          currentValue = _locationController.text;
+          break;
       }
     }
 
@@ -208,8 +230,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     case 1:
                       _ageController.text = currentValue;
                       break;
-                    default:
-                      _infoControllers[fieldIndex - 2].text = currentValue;
+                    case 2:
+                      _bioController.text = currentValue;
+                      break;
+                    case 3:
+                      _locationController.text = currentValue;
+                      break;
                   }
                 }
               });
@@ -228,18 +254,128 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  void _saveChanges() {
-    // Save changes and pop back with updated profile
-    final updatedProfile = {
-      'name': '${_nameController.text}, ${_ageController.text}',
-      'age': int.tryParse(_ageController.text) ?? 0,
-      'info': _infoControllers.map((c) => c.text).toList(),
-      'imageUrls': _imageControllers
-          .map((c) => c.text)
+  void _saveChanges() async {
+    if (isSaving) return; // Prevent multiple simultaneous saves
+
+    setState(() {
+      isSaving = true;
+    });
+
+    try {
+      // Play button sound
+      GameBoySound.playButtonClick();
+
+      // Prepare the data for the API
+      final name = _nameController.text.trim();
+      final ageText = _ageController.text.trim();
+      final bio = _bioController.text.trim();
+      final location = _locationController.text.trim();
+      final images = _imageControllers
+          .map((c) => c.text.trim())
           .where((url) => url.isNotEmpty)
-          .toList(),
-    };
-    Navigator.pop(context, updatedProfile);
+          .toList();
+
+      // Validate required fields
+      if (name.isEmpty) {
+        GameBoySound.playError();
+        GameboyActionPopup.show(
+          context,
+          'Error',
+          message: 'Name is required',
+          backgroundColor: Colors.red,
+          icon: Icons.error,
+        );
+        return;
+      }
+
+      int? age;
+      if (ageText.isNotEmpty) {
+        age = int.tryParse(ageText);
+        if (age == null || age < 18 || age > 99) {
+          GameBoySound.playError();
+          GameboyActionPopup.show(
+            context,
+            'Error',
+            message: 'Age must be between 18 and 99',
+            backgroundColor: Colors.red,
+            icon: Icons.error,
+            duration: Duration(milliseconds: 1500),
+          );
+          return;
+        }
+      }
+
+      print('🚀 Updating profile...');
+      final result = await ApiService.updateProfile(
+        name: name,
+        bio: bio.isEmpty ? null : bio,
+        age: age,
+        location: location.isEmpty ? null : location,
+        images: images.isEmpty ? null : images,
+      );
+
+      if (result['success']) {
+        final isNewProfile =
+            widget.currentProfile['name']?.toString().trim().isEmpty ?? true;
+        print(
+          '✅ Profile ${isNewProfile ? "created" : "updated"} successfully!',
+        );
+        GameBoySound.playSuccess();
+
+        GameboyActionPopup.show(
+          context,
+          'Success',
+          message: isNewProfile
+              ? 'Profile created successfully!'
+              : 'Profile updated successfully!',
+          backgroundColor: Colors.green,
+          icon: Icons.check_circle,
+        );
+
+        // Navigate back with the updated profile data
+        Future.delayed(Duration(milliseconds: 800), () {
+          if (mounted) {
+            final updatedProfile = {
+              'name': '$name${age != null ? ', $age' : ''}',
+              'age': age ?? 0,
+              'bio': bio,
+              'location': location,
+              'images': images,
+              'imageUrls': images, // For backwards compatibility
+            };
+            Navigator.pop(context, updatedProfile);
+          }
+        });
+      } else {
+        print('❌ Profile update failed: ${result['message']}');
+        GameBoySound.playError();
+
+        GameboyActionPopup.show(
+          context,
+          'Update Failed',
+          message: result['message'] ?? 'Unknown error occurred',
+          backgroundColor: Colors.red,
+          icon: Icons.error,
+        );
+      }
+    } catch (e) {
+      print('💥 Profile update error: $e');
+      GameBoySound.playError();
+
+      GameboyActionPopup.show(
+        context,
+        'Network Error',
+        message: 'Unable to connect to server',
+        backgroundColor: Colors.red,
+        icon: Icons.wifi_off,
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isSaving = false;
+        });
+      }
+    }
   }
 
   @override
@@ -384,7 +520,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           children: [
             // Title
             Text(
-              showImageInputs ? 'EDIT IMAGES' : 'EDIT PROFILE',
+              showImageInputs
+                  ? 'EDIT IMAGES'
+                  : (widget.currentProfile['name']?.toString().trim().isEmpty ??
+                        true)
+                  ? 'CREATE PROFILE'
+                  : 'EDIT PROFILE',
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 10, // Reduced from 12
@@ -435,24 +576,33 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               _buildInputField(
                 1,
                 Icons.numbers,
-                _ageController.text.isEmpty ? 'Age' : _ageController.text,
+                _ageController.text.isEmpty ? 'age' : _ageController.text,
                 _ageController.text.isEmpty,
               ),
               const SizedBox(height: 4),
 
-              ...List.generate(3, (index) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 4.0),
-                  child: _buildInputField(
-                    index + 2,
-                    Icons.info,
-                    _infoControllers[index].text.isEmpty
-                        ? 'Info ${index + 1}'
-                        : _infoControllers[index].text,
-                    _infoControllers[index].text.isEmpty,
-                  ),
-                );
-              }),
+              // Bio field
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4.0),
+                child: _buildInputField(
+                  2,
+                  Icons.edit,
+                  _bioController.text.isEmpty ? 'Bio' : _bioController.text,
+                  _bioController.text.isEmpty,
+                ),
+              ),
+              // Location field
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4.0),
+                child: _buildInputField(
+                  3,
+                  Icons.location_on,
+                  _locationController.text.isEmpty
+                      ? 'Location'
+                      : _locationController.text,
+                  _locationController.text.isEmpty,
+                ),
+              ),
             ] else ...[
               // Image editing fields
               ...List.generate(3, (index) {
@@ -476,7 +626,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               padding: EdgeInsets.symmetric(vertical: 4),
               decoration: BoxDecoration(
                 color:
-                    (showImageInputs ? selectedField == 3 : selectedField == 5)
+                    (showImageInputs
+                        ? selectedField == 3
+                        : selectedField == 4) // Changed from 5 to 4
                     ? Colors.yellow.withOpacity(0.8)
                     : Colors.black.withOpacity(0.8),
                 borderRadius: BorderRadius.circular(4),
@@ -484,20 +636,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   color:
                       (showImageInputs
                           ? selectedField == 3
-                          : selectedField == 5)
+                          : selectedField == 4) // Changed from 5 to 4
                       ? Colors.black
                       : Colors.grey,
                   width: 1,
                 ),
               ),
               child: Text(
-                'SAVE CHANGES',
+                isSaving
+                    ? 'SAVING...'
+                    : (widget.currentProfile['name']
+                              ?.toString()
+                              .trim()
+                              .isEmpty ??
+                          true)
+                    ? 'CREATE PROFILE'
+                    : 'SAVE CHANGES',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color:
                       (showImageInputs
                           ? selectedField == 3
-                          : selectedField == 5)
+                          : selectedField == 4) // Changed from 5 to 4
                       ? Colors.black
                       : Colors.white,
                   fontWeight: FontWeight.bold,
