@@ -91,50 +91,217 @@ class ImageProcessor {
 
   async convertToRetro8Bit(inputPath, outputFilename, size = 200) {
     try {
-      console.log(`🎨 Processing 8-bit retro image: ${outputFilename}`);
+      console.log(`🎨 Processing balanced 8-bit pixel art: ${outputFilename}`);
       
-      // Create authentic 8-bit retro effect with enhanced pixelation and vibrant colors
+      // Step 1: Use a more moderate pixel size for balanced effect
+      const pixelSize = 48; // Increased from 32 for less extreme pixelation
+      
+      // Step 2: Create the 8-bit color palette (RGB values)
+      const palette = [
+        [0, 0, 0],       // Black
+        [255, 255, 255], // White  
+        [255, 0, 0],     // Red
+        [0, 255, 0],     // Green
+        [0, 0, 255],     // Blue
+        [255, 255, 0],   // Yellow
+        [0, 255, 255],   // Cyan
+        [255, 0, 255]    // Magenta
+      ];
+      
+      // Step 3: Process the image with moderate 8-bit effect
       const processedBuffer = await sharp(inputPath)
-        .resize(size, size, { 
+        // Resize to moderate resolution for balanced pixels
+        .resize(pixelSize, pixelSize, { 
+          kernel: 'nearest',
           fit: 'cover',
           position: 'center'
         })
-        // Enhance saturation for more vibrant RGB colors
+        // Moderate saturation boost for retro feel without overdoing it
         .modulate({
-          saturation: 1.8, // Boost saturation for vivid retro colors
-          brightness: 1.1  // Slight brightness increase
+          saturation: 1.6, // Reduced from 2.0
+          brightness: 1.05 // Reduced from 1.1
         })
-        // Create heavy pixelation effect
-        .resize(16, 16, { kernel: 'nearest' }) // Very small for chunky pixels
-        .resize(size, size, { kernel: 'nearest' }) // Scale back up maintaining pixel blocks
-        // Apply limited color palette for authentic retro look
+        // Apply the 8-color palette
         .png({
           palette: true,
-          colors: 32, // Increased from 16 for better color variety but still retro
-          dither: 0.3, // Reduced dither for cleaner pixel blocks
-          compressionLevel: 0 // No compression to maintain sharp pixels
+          colors: 8,           // Exactly 8 colors as specified
+          dither: 0,           // No dithering for clean pixel boundaries
+          compressionLevel: 0, // No compression
+          effort: 10           // Maximum effort for color quantization
+        })
+        .toBuffer();
+      
+      // Step 4: Take the pixelated result and upscale using nearest-neighbor
+      const finalBuffer = await sharp(processedBuffer)
+        .resize(size, size, { 
+          kernel: 'nearest',  // Crucial: maintains blocky pixels
+          fit: 'fill'         // Don't change aspect ratio
+        })
+        .png({
+          compressionLevel: 0,
+          adaptiveFiltering: false // Prevent smoothing
         })
         .toBuffer();
 
       // Upload to Supabase storage
-      await this.uploadToSupabase(processedBuffer, outputFilename, 'image/png');
+      await this.uploadToSupabase(finalBuffer, outputFilename, 'image/png');
       
-      console.log(`✅ 8-bit retro image processed and uploaded: ${outputFilename}`);
+      console.log(`✅ Authentic 8-bit pixel art processed and uploaded: ${outputFilename}`);
       return this.getSupabaseImageUrl(outputFilename);
     } catch (error) {
-      console.error('❌ Error processing 8-bit retro image:', error);
-      throw new Error(`8-bit retro processing failed: ${error.message}`);
+      console.error('❌ Error processing 8-bit pixel art:', error);
+      throw new Error(`8-bit pixel art processing failed: ${error.message}`);
     }
   }
 
   async convertToGameBoyStyle(inputPath, outputFilename) {
-    // Use the same 8-bit processing for consistency
-    return this.convertToRetro8Bit(inputPath, outputFilename, 160);
+    try {
+      console.log(`🎮 Processing balanced GameBoy Color-style image: ${outputFilename}`);
+      
+      // GameBoy Color with moderate pixelation
+      const pixelSize = 56; // Increased from 40 for less extreme effect
+      
+      const processedBuffer = await sharp(inputPath)
+        .resize(pixelSize, pixelSize, { 
+          kernel: 'nearest',
+          fit: 'cover',
+          position: 'center'
+        })
+        // Moderate color enhancement
+        .modulate({
+          saturation: 1.5, // Reduced from 1.8
+          brightness: 1.1  // Reduced from 1.2
+        })
+        // Use 8-color palette like original spec
+        .png({
+          palette: true,
+          colors: 8,
+          dither: 0,
+          compressionLevel: 0,
+          effort: 10
+        })
+        .toBuffer();
+      
+      // Upscale to final size maintaining pixels
+      const finalBuffer = await sharp(processedBuffer)
+        .resize(160, 160, { 
+          kernel: 'nearest',
+          fit: 'fill'
+        })
+        .png({
+          compressionLevel: 0,
+          adaptiveFiltering: false
+        })
+        .toBuffer();
+
+      // Upload to Supabase storage
+      await this.uploadToSupabase(finalBuffer, outputFilename, 'image/png');
+      
+      console.log(`✅ GameBoy Color-style image processed and uploaded: ${outputFilename}`);
+      return this.getSupabaseImageUrl(outputFilename);
+    } catch (error) {
+      console.error('❌ Error processing GameBoy Color-style image:', error);
+      throw new Error(`GameBoy Color-style processing failed: ${error.message}`);
+    }
   }
 
   async convertToRetroPixelated(inputPath, outputFilename) {
-    // Use the same 8-bit processing for consistency
-    return this.convertToRetro8Bit(inputPath, outputFilename, 200);
+    try {
+      console.log(`🕹️ Processing moderate retro pixel art: ${outputFilename}`);
+      
+      // Retro style with moderate pixelation
+      const pixelSize = 36; // Increased from 24 for less extreme effect
+      
+      const processedBuffer = await sharp(inputPath)
+        .resize(pixelSize, pixelSize, { 
+          kernel: 'nearest',
+          fit: 'cover',
+          position: 'center'
+        })
+        // Moderate saturation for retro colors
+        .modulate({
+          saturation: 1.8, // Reduced from 2.2
+          brightness: 1.08 // Reduced from 1.15
+        })
+        // Strict 8-color palette
+        .png({
+          palette: true,
+          colors: 8,           // Exactly 8 basic colors
+          dither: 0,           // No dithering for clean pixels
+          compressionLevel: 0,
+          effort: 10
+        })
+        .toBuffer();
+      
+      // Upscale to create large, chunky pixels
+      const finalBuffer = await sharp(processedBuffer)
+        .resize(200, 200, { 
+          kernel: 'nearest',
+          fit: 'fill'
+        })
+        .png({
+          compressionLevel: 0,
+          adaptiveFiltering: false
+        })
+        .toBuffer();
+
+      // Upload to Supabase storage
+      await this.uploadToSupabase(finalBuffer, outputFilename, 'image/png');
+      
+      console.log(`✅ NES-style 8-bit pixel art processed and uploaded: ${outputFilename}`);
+      return this.getSupabaseImageUrl(outputFilename);
+    } catch (error) {
+      console.error('❌ Error processing NES-style pixel art:', error);
+      throw new Error(`NES-style pixel art processing failed: ${error.message}`);
+    }
+  }
+
+  // Alternative method for controlled pixelation
+  async convertToExtremePixelArt(inputPath, outputFilename, pixelResolution = 24) {
+    try {
+      console.log(`🎯 Processing controlled pixel art (${pixelResolution}x${pixelResolution}): ${outputFilename}`);
+      
+      const processedBuffer = await sharp(inputPath)
+        .resize(pixelResolution, pixelResolution, { 
+          kernel: 'nearest',
+          fit: 'cover',
+          position: 'center'
+        })
+        // Balanced saturation for clean retro look
+        .modulate({
+          saturation: 2.0, // Reduced from 2.5
+          brightness: 1.08 // Reduced from 1.1
+        })
+        // Force exactly 8 colors: Black, White, Red, Green, Blue, Yellow, Cyan, Magenta
+        .png({
+          palette: true,
+          colors: 8,
+          dither: 0,
+          compressionLevel: 0,
+          effort: 10
+        })
+        .toBuffer();
+      
+      // Upscale with nearest-neighbor to maintain crisp pixels
+      const finalBuffer = await sharp(processedBuffer)
+        .resize(200, 200, { 
+          kernel: 'nearest',
+          fit: 'fill'
+        })
+        .png({
+          compressionLevel: 0,
+          adaptiveFiltering: false
+        })
+        .toBuffer();
+
+      await this.uploadToSupabase(finalBuffer, outputFilename, 'image/png');
+      
+      console.log(`✅ Extreme pixel art (${pixelResolution}x${pixelResolution}) processed: ${outputFilename}`);
+      return this.getSupabaseImageUrl(outputFilename);
+    } catch (error) {
+      console.error('❌ Error processing extreme pixel art:', error);
+      throw new Error(`Extreme pixel art processing failed: ${error.message}`);
+    }
   }
 
   async deleteFile(filePath) {
