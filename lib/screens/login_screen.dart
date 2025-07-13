@@ -184,7 +184,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       try {
         print('🚀 Attempting login with email: $email');
-        final result = await ApiService.login(email: email, password: password);
+        final result = await ApiService.login(email, password);
 
         print('📥 Login API response: $result');
 

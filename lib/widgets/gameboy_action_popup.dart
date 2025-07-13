@@ -16,8 +16,10 @@ class GameboyActionPopup {
       builder: (BuildContext context) {
         // Auto dismiss after duration
         Future.delayed(duration, () {
-          if (Navigator.of(context).canPop()) {
-            Navigator.of(context).pop();
+          // Check if the widget is still mounted and context is valid
+          if (context.mounted &&
+              Navigator.of(context, rootNavigator: true).canPop()) {
+            Navigator.of(context, rootNavigator: true).pop();
           }
         });
 

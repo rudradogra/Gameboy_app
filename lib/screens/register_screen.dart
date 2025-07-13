@@ -187,10 +187,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
             '🚀 Attempting registration with email: $email, username: $username, name: $name',
           );
           final result = await ApiService.register(
-            email: email,
-            password: password,
-            username: username,
-            name: name,
+            email,
+            password,
+            username,
+            name,
           );
 
           print('📥 Registration API response: $result');
@@ -226,21 +226,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
           } else {
             print('❌ Registration failed: ${result['message']}');
             print('🔍 Full error response: $result');
+            print('🔍 Status code: ${result['status_code']}');
+            print('🔍 Error type: ${result['error']}');
+
             // Play error sound
             GameBoySound.playError();
 
-            // Show error message
+            // Determine detailed error message
+            String errorMessage = result['message'] ?? 'Unknown error occurred';
+            if (result['status_code'] != null) {
+              errorMessage += '\nStatus: ${result['status_code']}';
+            }
+            if (result['error'] != null &&
+                result['error'] != result['message']) {
+              errorMessage += '\nError: ${result['error']}';
+            }
+
+            // Show detailed error message
             GameboyActionPopup.show(
               context,
               'Registration Failed',
-              message: result['message'] ?? 'Unknown error occurred',
+              message: errorMessage,
               backgroundColor: Colors.red,
               icon: Icons.error,
+              duration: Duration(seconds: 3),
             );
           }
-        } catch (e) {
+        } catch (e, stackTrace) {
           print('💥 Registration exception caught: $e');
           print('🔍 Exception type: ${e.runtimeType}');
+          print('📍 Stack trace: $stackTrace');
           setState(() {
             isLoading = false;
           });
@@ -251,9 +266,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
           GameboyActionPopup.show(
             context,
             'Network Error',
-            message: 'Unable to connect to server: $e',
+            message:
+                'Unable to connect to server\nError: $e\nType: ${e.runtimeType}',
             backgroundColor: Colors.red,
             icon: Icons.wifi_off,
+            duration: Duration(seconds: 3),
           );
         }
       } else {

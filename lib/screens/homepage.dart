@@ -25,31 +25,124 @@ class _HomePageState extends State<HomePage> {
   int currentProfileIndex = 0;
   int currentImageIndex = 0;
   bool showProfileInfo = false;
+  bool isLoading = true;
+  bool isPerformingAction = false;
 
-  final List<Map<String, dynamic>> profiles = [
-    {
-      'imageUrls': [
-        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
-        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face',
-        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop&crop=face',
-      ],
-      'name': 'Rudra Dogra',
-      'age': 19,
-      'info': ['Software Developer', 'From Delhi', 'Loves coding and gaming!'],
-    },
-    {
-      'imageUrls': [
-        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face',
-        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face',
-        'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=face',
-      ],
-      'name': 'Alex Rodriguez',
-      'age': 25,
-      'info': ['Photographer', 'From Barcelona', 'Adventure seeker'],
-    },
-  ];
+  List<Map<String, dynamic>> profiles = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfiles();
+  }
+
+  Future<void> _loadProfiles() async {
+    try {
+      print('🔄 HomePage: Starting _loadProfiles method');
+      setState(() {
+        isLoading = true;
+      });
+
+      print('🔄 Loading profiles from backend...');
+      final result = await ApiService.discoverProfiles(page: 1, limit: 10);
+
+      print('📥 HomePage: Received API result: ${result['success']}');
+      print('🔍 HomePage: Full API response: $result');
+
+      if (result['success']) {
+        print('✅ HomePage: API call successful, processing data...');
+
+        // Check if 'data' key exists and has 'profiles'
+        if (result['data'] == null) {
+          print('❌ HomePage: result[data] is null!');
+          print('🔍 HomePage: Available keys: ${result.keys.toList()}');
+        } else {
+          print('✅ HomePage: result[data] exists');
+          print('🔍 HomePage: data keys: ${result['data'].keys.toList()}');
+        }
+
+        final profilesData = result['data']['profiles'] as List;
+        print('📋 HomePage: Raw profiles data length: ${profilesData.length}');
+        print(
+          '🔍 HomePage: First profile sample: ${profilesData.isNotEmpty ? profilesData[0] : 'No profiles'}',
+        );
+
+        // Transform backend data to match frontend format
+        final transformedProfiles = profilesData.map((profile) {
+          print(
+            '🔄 HomePage: Transforming profile: ${profile['id']} - ${profile['name']}',
+          );
+          return {
+            'id': profile['id'],
+            'user_id': profile['user_id'],
+            'imageUrls':
+                (profile['image_urls'] as List?)?.cast<String>() ??
+                [
+                  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
+                ],
+            'name': profile['name'] ?? 'Anonymous',
+            'age': profile['age'] ?? 18,
+            'info': [
+              profile['bio'] ?? 'No bio available',
+              profile['location'] ?? 'Location not specified',
+              (profile['interests'] as List?)?.join(', ') ??
+                  'No interests listed',
+            ],
+          };
+        }).toList();
+
+        print(
+          '✅ HomePage: Transformation complete, ${transformedProfiles.length} profiles transformed',
+        );
+
+        setState(() {
+          profiles = transformedProfiles;
+          currentProfileIndex = 0;
+          currentImageIndex = 0;
+          showProfileInfo = false;
+          isLoading = false;
+        });
+
+        print('✅ Loaded ${profiles.length} profiles');
+      } else {
+        print('❌ Failed to load profiles: ${result['message']}');
+        print('🔍 HomePage: Error details: ${result['error']}');
+        setState(() {
+          isLoading = false;
+        });
+
+        // Show error popup
+        GameBoySound.playError();
+        GameboyActionPopup.show(
+          context,
+          'Error',
+          message: 'Failed to load profiles: ${result['message']}',
+          backgroundColor: Colors.red,
+          icon: Icons.error,
+        );
+      }
+    } catch (e, stackTrace) {
+      print('💥 Error loading profiles: $e');
+      print('📍 Stack trace: $stackTrace');
+      setState(() {
+        isLoading = false;
+      });
+
+      GameBoySound.playError();
+      GameboyActionPopup.show(
+        context,
+        'Network Error',
+        message: 'Unable to connect to server: $e',
+        backgroundColor: Colors.red,
+        icon: Icons.wifi_off,
+      );
+    }
+  }
 
   void _handleDpadNavigation(String direction) {
+    // Don't allow navigation if loading or no profiles
+    if (isLoading || profiles.isEmpty || isPerformingAction) return;
+
     setState(() {
       if (direction == 'down') {
         // Toggle info when down is pressed
@@ -79,48 +172,237 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _handleSuperlike() {
-    GameboyActionPopup.show(
-      context,
-      'SUPERLIKE!',
-      message: '${profiles[currentProfileIndex]['name']}\nSUPERLIKED!',
-      backgroundColor: Colors.amber,
-      icon: Icons.star,
-      duration: Duration(milliseconds: 500),
-    );
-    _nextProfile();
+  void _handleSuperlike() async {
+    if (isPerformingAction || profiles.isEmpty) return;
+
+    setState(() {
+      isPerformingAction = true;
+    });
+
+    try {
+      final currentProfile = profiles[currentProfileIndex];
+      print('💫 Superliking ${currentProfile['name']}...');
+
+      // Show immediate feedback
+      GameboyActionPopup.show(
+        context,
+        'SUPERLIKE!',
+        message: '${currentProfile['name']}\nSUPERLIKED!',
+        backgroundColor: Colors.amber,
+        icon: Icons.star,
+        duration: Duration(milliseconds: 500),
+      );
+
+      // Send to backend
+      final result = await ApiService.handleSwipe(
+        currentProfile['user_id'],
+        'superlike',
+      );
+
+      if (result['success']) {
+        print('✅ Superlike sent successfully');
+
+        // Check if it's a mutual match
+        final matchData = result['data'];
+        if (matchData['is_mutual'] == true) {
+          // Show match popup
+          Future.delayed(Duration(milliseconds: 600), () {
+            GameboyActionPopup.show(
+              context,
+              'IT\'S A MATCH!',
+              message: 'You and ${currentProfile['name']} liked each other!',
+              backgroundColor: Colors.pink,
+              icon: Icons.favorite,
+              duration: Duration(milliseconds: 1500),
+            );
+          });
+        }
+      } else {
+        print('❌ Superlike failed: ${result['message']}');
+      }
+    } catch (e) {
+      print('💥 Superlike error: $e');
+    } finally {
+      setState(() {
+        isPerformingAction = false;
+      });
+      _nextProfile();
+    }
   }
 
-  void _handleLike() {
-    GameboyActionPopup.show(
-      context,
-      'LIKED!',
-      message: '${profiles[currentProfileIndex]['name']}\nLIKED!',
-      backgroundColor: Colors.green,
-      icon: Icons.favorite,
-      duration: Duration(milliseconds: 500),
-    );
-    _nextProfile();
+  void _handleLike() async {
+    if (isPerformingAction || profiles.isEmpty) return;
+
+    setState(() {
+      isPerformingAction = true;
+    });
+
+    try {
+      final currentProfile = profiles[currentProfileIndex];
+      print('❤️ Liking ${currentProfile['name']}...');
+
+      // Show immediate feedback
+      GameboyActionPopup.show(
+        context,
+        'LIKED!',
+        message: '${currentProfile['name']}\nLIKED!',
+        backgroundColor: Colors.green,
+        icon: Icons.favorite,
+        duration: Duration(milliseconds: 500),
+      );
+
+      // Send to backend
+      final result = await ApiService.handleSwipe(
+        currentProfile['user_id'],
+        'like',
+      );
+
+      if (result['success']) {
+        print('✅ Like sent successfully');
+
+        // Check if it's a mutual match
+        final matchData = result['data'];
+        if (matchData['is_mutual'] == true) {
+          // Show match popup
+          Future.delayed(Duration(milliseconds: 600), () {
+            GameboyActionPopup.show(
+              context,
+              'IT\'S A MATCH!',
+              message: 'You and ${currentProfile['name']} liked each other!',
+              backgroundColor: Colors.pink,
+              icon: Icons.favorite,
+              duration: Duration(milliseconds: 1500),
+            );
+          });
+        }
+      } else {
+        print('❌ Like failed: ${result['message']}');
+      }
+    } catch (e) {
+      print('💥 Like error: $e');
+    } finally {
+      setState(() {
+        isPerformingAction = false;
+      });
+      _nextProfile();
+    }
   }
 
-  void _handlePass() {
-    GameboyActionPopup.show(
-      context,
-      'PASSED',
-      message: '${profiles[currentProfileIndex]['name']}\nPASSED',
-      backgroundColor: Colors.redAccent,
-      icon: Icons.close,
-      duration: Duration(milliseconds: 500),
-    );
-    _nextProfile();
+  void _handlePass() async {
+    if (isPerformingAction || profiles.isEmpty) return;
+
+    setState(() {
+      isPerformingAction = true;
+    });
+
+    try {
+      final currentProfile = profiles[currentProfileIndex];
+      print('👎 Passing ${currentProfile['name']}...');
+
+      // Show immediate feedback
+      GameboyActionPopup.show(
+        context,
+        'PASSED',
+        message: '${currentProfile['name']}\nPASSED',
+        backgroundColor: Colors.redAccent,
+        icon: Icons.close,
+        duration: Duration(milliseconds: 500),
+      );
+
+      // Send to backend
+      final result = await ApiService.handleSwipe(
+        currentProfile['user_id'],
+        'pass',
+      );
+
+      if (result['success']) {
+        print('✅ Pass sent successfully');
+      } else {
+        print('❌ Pass failed: ${result['message']}');
+      }
+    } catch (e) {
+      print('💥 Pass error: $e');
+    } finally {
+      setState(() {
+        isPerformingAction = false;
+      });
+      _nextProfile();
+    }
   }
 
   void _nextProfile() {
+    if (profiles.isEmpty) return;
+
     setState(() {
-      currentProfileIndex = (currentProfileIndex + 1) % profiles.length;
-      currentImageIndex = 0; // Reset image index for new profile
-      showProfileInfo = false; // Reset info state for new profile
+      // Remove current profile from the list
+      profiles.removeAt(currentProfileIndex);
+
+      // If we're at the last profile, reset to 0
+      if (currentProfileIndex >= profiles.length && profiles.isNotEmpty) {
+        currentProfileIndex = 0;
+      }
+
+      // Reset image index and info state for new profile
+      currentImageIndex = 0;
+      showProfileInfo = false;
     });
+
+    // If we're running low on profiles, load more
+    if (profiles.length <= 2) {
+      _loadMoreProfiles();
+    }
+
+    // If no profiles left, show message
+    if (profiles.isEmpty) {
+      GameboyActionPopup.show(
+        context,
+        'No More Profiles',
+        message: 'Check back later for more people!',
+        backgroundColor: Colors.blue,
+        icon: Icons.refresh,
+        duration: Duration(seconds: 2),
+      );
+    }
+  }
+
+  Future<void> _loadMoreProfiles() async {
+    try {
+      print('🔄 Loading more profiles...');
+      final result = await ApiService.discoverProfiles(page: 1, limit: 10);
+
+      if (result['success']) {
+        final profilesData = result['data']['profiles'] as List;
+
+        // Transform and add new profiles
+        final newProfiles = profilesData.map((profile) {
+          return {
+            'id': profile['id'],
+            'user_id': profile['user_id'],
+            'imageUrls':
+                (profile['image_urls'] as List?)?.cast<String>() ??
+                [
+                  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
+                ],
+            'name': profile['name'] ?? 'Anonymous',
+            'age': profile['age'] ?? 18,
+            'info': [
+              profile['bio'] ?? 'No bio available',
+              profile['location'] ?? 'Location not specified',
+              (profile['interests'] as List?)?.join(', ') ??
+                  'No interests listed',
+            ],
+          };
+        }).toList();
+
+        setState(() {
+          profiles.addAll(newProfiles);
+        });
+
+        print('✅ Added ${newProfiles.length} more profiles');
+      }
+    } catch (e) {
+      print('💥 Error loading more profiles: $e');
+    }
   }
 
   void _logout() {
@@ -174,7 +456,9 @@ class _HomePageState extends State<HomePage> {
       print('🔄 Starting edit profile flow...');
 
       // Fetch the logged-in user's profile
-      final result = await ApiService.getMyProfile();
+      final result = await ApiService.getCurrentUser();
+
+      print('📥 getCurrentUser result: $result');
 
       if (result['success']) {
         final userProfile = result['data']['profile'];
@@ -212,16 +496,20 @@ class _HomePageState extends State<HomePage> {
           });
         }
       } else {
-        // Check if this is a "profile not found" error
+        // Check if this is a "profile not found" error or if we should create profile
+        final shouldCreateProfile =
+            result['should_create_profile'] == true ||
+            result['error'] == 'PROFILE_NOT_FOUND' ||
+            result['status_code'] == 404;
+
         final errorMessage = result['message'] ?? '';
-        final isProfileNotFound =
-            errorMessage.toLowerCase().contains('profile not found') ||
-            errorMessage.toLowerCase().contains('create your profile');
 
         print('🔍 Error message: $errorMessage');
-        print('🔍 Is profile not found: $isProfileNotFound');
+        print('🔍 Should create profile: $shouldCreateProfile');
+        print('🔍 Status code: ${result['status_code']}');
+        print('🔍 Error type: ${result['error']}');
 
-        if (isProfileNotFound) {
+        if (shouldCreateProfile) {
           // Profile doesn't exist yet - navigate directly to create profile
           print('✅ Profile not found - navigating to create profile');
           GameBoySound.playNavigation();
@@ -235,17 +523,20 @@ class _HomePageState extends State<HomePage> {
                 builder: (context) => EditProfileScreen(
                   currentProfile: {
                     'name': '',
-                    'age':
-                        null, // Changed from 18 to null so it shows placeholder
+                    'age': null, // null so it shows placeholder
                     'bio': '',
+                    'location': '',
                     'interests': <String>[],
-                    'profilePicture': null,
+                    'imageUrls': <String>[],
+                    'images': <String>[],
                   },
                 ),
               ),
             ).then((updatedProfile) {
               if (updatedProfile != null) {
                 print('✅ Profile created: $updatedProfile');
+                // Optionally reload the homepage data
+                _loadProfiles();
               }
             });
           } else {
@@ -253,6 +544,7 @@ class _HomePageState extends State<HomePage> {
           }
         } else {
           // Other errors - show error message
+          print('❌ Other error occurred: $errorMessage');
           GameBoySound.playError();
           GameboyActionPopup.show(
             context,
@@ -281,7 +573,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     print('🏠 HomePage build method called');
-    final currentProfile = profiles[currentProfileIndex];
 
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A1A), // Subtle dark background
@@ -313,19 +604,7 @@ class _HomePageState extends State<HomePage> {
                         padding: const EdgeInsets.symmetric(horizontal: 28.0),
                         child: AspectRatio(
                           aspectRatio: 1.1,
-                          child: GameboyScreen(
-                            child: GameboyProfileCard(
-                              key: ValueKey(
-                                'profile_${currentProfileIndex}_${currentImageIndex}_$showProfileInfo',
-                              ),
-                              imageUrl: currentProfile['imageUrls'],
-                              name: currentProfile['name'],
-                              age: currentProfile['age'],
-                              info: List<String>.from(currentProfile['info']),
-                              currentImageIndex: currentImageIndex,
-                              showInfo: showProfileInfo,
-                            ),
-                          ),
+                          child: GameboyScreen(child: _buildScreenContent()),
                         ),
                       ),
                       // GameBoy Logo in black border container
@@ -367,7 +646,12 @@ class _HomePageState extends State<HomePage> {
                                       top: 50,
                                       child: GameboyButton(
                                         label: 'B',
-                                        onPressed: _handlePass,
+                                        onPressed:
+                                            isLoading ||
+                                                profiles.isEmpty ||
+                                                isPerformingAction
+                                            ? null
+                                            : _handlePass,
                                       ),
                                     ),
                                     // A button (top-right)
@@ -376,7 +660,12 @@ class _HomePageState extends State<HomePage> {
                                       top: 0,
                                       child: GameboyButton(
                                         label: 'A',
-                                        onPressed: _handleLike,
+                                        onPressed:
+                                            isLoading ||
+                                                profiles.isEmpty ||
+                                                isPerformingAction
+                                            ? null
+                                            : _handleLike,
                                       ),
                                     ),
                                   ],
@@ -398,7 +687,7 @@ class _HomePageState extends State<HomePage> {
                                 // Show controls popup
                                 GameboyControlsPopup.show(context, {
                                   '↑ ↓': 'Not used',
-                                  '← →': 'Not used',
+                                  '← →': 'Change photo',
                                   'CENTER': 'Edit your profile',
                                   '↓': 'Toggle profile info',
                                   'A': 'Like profile',
@@ -436,6 +725,91 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildScreenContent() {
+    if (isLoading) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(color: Colors.black54, strokeWidth: 2),
+            SizedBox(height: 16),
+            Text(
+              'Loading Profiles...',
+              style: TextStyle(
+                color: Colors.black54,
+                fontSize: 12,
+                fontFamily: 'PublicPixel',
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (profiles.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.people_outline, color: Colors.black54, size: 48),
+            SizedBox(height: 16),
+            Text(
+              'No More Profiles',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'PublicPixel',
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Check back later!',
+              style: TextStyle(
+                color: Colors.black54,
+                fontSize: 10,
+                fontFamily: 'PublicPixel',
+              ),
+            ),
+            SizedBox(height: 16),
+            GestureDetector(
+              onTap: _loadProfiles,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: Colors.black54),
+                ),
+                child: Text(
+                  'REFRESH',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 10,
+                    fontFamily: 'PublicPixel',
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final currentProfile = profiles[currentProfileIndex];
+    return GameboyProfileCard(
+      key: ValueKey(
+        'profile_${currentProfile['id']}_${currentImageIndex}_$showProfileInfo',
+      ),
+      imageUrl: currentProfile['imageUrls'],
+      name: currentProfile['name'],
+      age: currentProfile['age'],
+      info: List<String>.from(currentProfile['info']),
+      currentImageIndex: currentImageIndex,
+      showInfo: showProfileInfo,
     );
   }
 }
