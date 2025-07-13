@@ -14,6 +14,7 @@ const userRoutes = require('./routes/users');
 const profileRoutes = require('./routes/profiles');
 const matchRoutes = require('./routes/matches');
 const uploadRoutes = require('./routes/upload');
+const imageRoutes = require('./routes/images');
 
 // Security middleware
 app.use(helmet());
@@ -65,6 +66,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/profiles', profileRoutes);
 app.use('/api/matches', matchRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/images', imageRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

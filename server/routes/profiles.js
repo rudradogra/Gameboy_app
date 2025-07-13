@@ -227,13 +227,23 @@ router.put('/me', authenticateToken, [
   body('age').optional().isInt({ min: 18, max: 99 }).withMessage('Age must be between 18 and 99'),
   body('location').optional().isLength({ max: 100 }).withMessage('Location must be less than 100 characters'),
   body('images').optional().isArray().withMessage('Images must be an array'),
-  body('images.*').optional().isURL().withMessage('Each image must be a valid URL'),
+  body('images.*').optional().isURL({
+    protocols: ['http', 'https'],
+    require_protocol: true,
+    allow_underscores: true,
+    host_whitelist: ['localhost', '127.0.0.1', '10.0.2.2'] // Allow local development URLs
+  }).withMessage('Each image must be a valid URL'),
   body('interests').optional().isArray().withMessage('Interests must be an array'),
   body('name').optional().notEmpty().withMessage('Name cannot be empty')
 ], async (req, res) => {
   try {
+    console.log('🔄 Profile update request received');
+    console.log('👤 User ID:', req.user.id);
+    console.log('📄 Request body:', JSON.stringify(req.body, null, 2));
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('❌ Validation errors:', errors.array());
       return res.status(400).json({
         error: 'Validation failed',
         details: errors.array()
