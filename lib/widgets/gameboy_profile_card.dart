@@ -193,21 +193,6 @@ class GameboyProfileCardState extends State<GameboyProfileCard>
             ],
           ),
         ),
-
-        // Hearts in top right
-        Positioned(
-          top: 12,
-          right: 12,
-          child: Row(
-            children: List.generate(
-              5,
-              (index) => const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 2.0),
-                child: Icon(Icons.favorite, color: Colors.red, size: 20),
-              ),
-            ),
-          ),
-        ),
       ],
     );
   }

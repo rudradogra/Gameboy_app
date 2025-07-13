@@ -27,8 +27,8 @@ class _HomePageState extends State<HomePage> {
   bool showProfileInfo = false;
   bool isLoading = true;
   bool isPerformingAction = false;
-  int likesCount = 0; // Track total likes
-  bool isOutOfLikes = false; // Track if user has used all likes
+  double heartsRemaining = 10.0; // Start with 10 full hearts
+  bool isOutOfHearts = false; // Track if user has used all hearts
 
   List<Map<String, dynamic>> profiles = [];
 
@@ -170,16 +170,29 @@ class _HomePageState extends State<HomePage> {
     if (direction == 'center') {
       _editProfile();
     } else if (direction == 'up') {
-      _handleSuperlike();
+      // Only allow superlike if we have enough hearts
+      if (!isOutOfHearts && heartsRemaining >= 1.0) {
+        _handleSuperlike();
+      } else {
+        // Show insufficient hearts message
+        _showInsufficientHeartsMessage('superlike', 1.0);
+      }
     }
   }
 
   void _handleSuperlike() async {
-    if (isPerformingAction || profiles.isEmpty || isOutOfLikes) return;
+    if (isPerformingAction ||
+        profiles.isEmpty ||
+        isOutOfHearts ||
+        heartsRemaining < 1.0)
+      return;
 
     setState(() {
       isPerformingAction = true;
-      likesCount += 2; // Count superlike as 2 likes
+      heartsRemaining -= 1.0; // Superlike costs 1 full heart
+      if (heartsRemaining <= 0) {
+        isOutOfHearts = true;
+      }
     });
 
     try {
@@ -231,55 +244,39 @@ class _HomePageState extends State<HomePage> {
       });
       _nextProfile();
 
-      // Check if 10 likes have been used
-      if (likesCount >= 10) {
+      // Check if hearts are depleted
+      if (heartsRemaining <= 0) {
         setState(() {
-          isOutOfLikes = true;
+          isOutOfHearts = true;
         });
-        
-        // Show out of likes popup with options
+
+        // Show out of hearts popup
         GameboyActionPopup.show(
           context,
-          'Out of Likes',
-          message: 'You\'ve used all your likes!\nWhat would you like to do?',
+          'Out of Hearts',
+          message:
+              'You\'ve used all your hearts!\nContinue exploring or edit your profile.',
           backgroundColor: Colors.red,
           icon: Icons.favorite_border,
-          duration: Duration(seconds: 2),
-          onDismiss: () {
-            // Show options popup
-            GameboyActionPopup.show(
-              context,
-              'Options',
-              message: '',
-              backgroundColor: const Color.fromARGB(255, 64, 64, 64),
-              icon: Icons.person,
-              onDismiss: () {
-                GameboyPillButton(
-                  label: 'Log Out',
-                  onPressed: () {
-                    _logout();
-                  },
-                );
-                GameboyPillButton(
-                  label: 'Edit Profile',
-                  onPressed: () {
-                    _editProfile();
-                  },
-                );
-              },
-            );
-          },
+          duration: Duration(seconds: 3),
         );
       }
     }
   }
 
   void _handleLike() async {
-    if (isPerformingAction || profiles.isEmpty || isOutOfLikes) return;
+    if (isPerformingAction ||
+        profiles.isEmpty ||
+        isOutOfHearts ||
+        heartsRemaining < 0.5)
+      return;
 
     setState(() {
       isPerformingAction = true;
-      likesCount++; // Increment likes count
+      heartsRemaining -= 0.5; // Like costs half a heart
+      if (heartsRemaining <= 0) {
+        isOutOfHearts = true;
+      }
     });
 
     try {
@@ -331,44 +328,21 @@ class _HomePageState extends State<HomePage> {
       });
       _nextProfile();
 
-      // Check if 10 likes have been used
-      if (likesCount >= 10) {
+      // Check if hearts are depleted
+      if (heartsRemaining <= 0) {
         setState(() {
-          isOutOfLikes = true;
+          isOutOfHearts = true;
         });
-        
-        // Show out of likes popup with options
+
+        // Show out of hearts popup
         GameboyActionPopup.show(
           context,
-          'Out of Likes',
-          message: 'You\'ve used all your likes!\nWhat would you like to do?',
+          'Out of Hearts',
+          message:
+              'You\'ve used all your hearts!\nContinue exploring or edit your profile.',
           backgroundColor: Colors.red,
           icon: Icons.favorite_border,
-          duration: Duration(seconds: 2),
-          onDismiss: () {
-            // Show options popup
-            GameboyActionPopup.show(
-              context,
-              'Options',
-              message: '',
-              backgroundColor: const Color.fromARGB(255, 78, 78, 78),
-              icon: Icons.person,
-              onDismiss: () {
-                GameboyPillButton(
-                  label: 'Log Out',
-                  onPressed: () {
-                    _logout();
-                  },
-                );
-                GameboyPillButton(
-                  label: 'Edit Profile',
-                  onPressed: () {
-                    _editProfile();
-                  },
-                );
-              },
-            );
-          },
+          duration: Duration(seconds: 3),
         );
       }
     }
@@ -656,6 +630,62 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void _showInsufficientHeartsMessage(String action, double required) {
+    GameboyActionPopup.show(
+      context,
+      'Not Enough Hearts',
+      message:
+          'Need ${required == 1.0 ? '1 full heart' : '½ heart'} to $action!',
+      backgroundColor: Colors.orange,
+      icon: Icons.favorite_border,
+      duration: Duration(milliseconds: 800),
+    );
+  }
+
+  Widget _buildHeartDisplay() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: List.generate(10, (index) {
+          double heartValue = heartsRemaining - index;
+
+          Widget heart;
+          if (heartValue >= 1.0) {
+            // Full heart
+            heart = Icon(Icons.favorite, color: Colors.red, size: 12);
+          } else if (heartValue >= 0.5) {
+            // Half heart
+            heart = Stack(
+              children: [
+                Icon(Icons.favorite_border, color: Colors.red, size: 12),
+                ClipRect(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    widthFactor: 0.5,
+                    child: Icon(Icons.favorite, color: Colors.red, size: 12),
+                  ),
+                ),
+              ],
+            );
+          } else {
+            // Empty heart
+            heart = Icon(
+              Icons.favorite_border,
+              color: Colors.red.withOpacity(0.3),
+              size: 12,
+            );
+          }
+
+          return Padding(
+            padding: EdgeInsets.symmetric(horizontal: 1),
+            child: heart,
+          );
+        }),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     print('🏠 HomePage build method called');
@@ -751,7 +781,17 @@ class _HomePageState extends State<HomePage> {
                                                 profiles.isEmpty ||
                                                 isPerformingAction
                                             ? null
-                                            : _handleLike,
+                                            : () {
+                                                if (isOutOfHearts ||
+                                                    heartsRemaining < 0.5) {
+                                                  _showInsufficientHeartsMessage(
+                                                    'like',
+                                                    0.5,
+                                                  );
+                                                } else {
+                                                  _handleLike();
+                                                }
+                                              },
                                       ),
                                     ),
                                   ],
@@ -776,11 +816,12 @@ class _HomePageState extends State<HomePage> {
                                   '← →': 'Change photo',
                                   'CENTER': 'Edit your profile',
                                   '↓': 'Toggle profile info',
-                                  'A': 'Like profile',
+                                  'A': 'Like profile (½ heart)',
                                   'B': 'Pass on profile',
                                   'START': 'Logout',
                                   'SELECT': 'Show controls (this popup)',
-                                  '↑': 'Superlike profile',
+                                  '↑': 'Superlike profile (1 heart)',
+                                  'HEARTS': 'You start with 10 hearts',
                                 });
                               },
                             ),
@@ -803,6 +844,8 @@ class _HomePageState extends State<HomePage> {
                           child: GameboySpeakerDots(),
                         ),
                       ),
+                      // Heart display
+                      _buildHeartDisplay(),
                     ],
                   ),
                 ],
@@ -886,16 +929,45 @@ class _HomePageState extends State<HomePage> {
     }
 
     final currentProfile = profiles[currentProfileIndex];
-    return GameboyProfileCard(
-      key: ValueKey(
-        'profile_${currentProfile['id']}_${currentImageIndex}_$showProfileInfo',
-      ),
-      imageUrl: currentProfile['imageUrls'],
-      name: currentProfile['name'],
-      age: currentProfile['age'],
-      info: List<String>.from(currentProfile['info']),
-      currentImageIndex: currentImageIndex,
-      showInfo: showProfileInfo,
+    return Column(
+      children: [
+        // Heart display at the top
+        _buildHeartDisplay(),
+        // Show out of hearts message if no hearts remaining, but still show profile
+        if (isOutOfHearts)
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.red.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(color: Colors.red.withOpacity(0.3)),
+            ),
+            child: Text(
+              'Out of hearts - Browse only',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 8,
+                fontFamily: 'PublicPixel',
+              ),
+            ),
+          ),
+        // Profile card takes remaining space
+        Expanded(
+          child: GameboyProfileCard(
+            key: ValueKey(
+              'profile_${currentProfile['id']}_${currentImageIndex}_$showProfileInfo',
+            ),
+            imageUrl: currentProfile['imageUrls'],
+            name: currentProfile['name'],
+            age: currentProfile['age'],
+            info: List<String>.from(currentProfile['info']),
+            currentImageIndex: currentImageIndex,
+            showInfo: showProfileInfo,
+          ),
+        ),
+      ],
     );
   }
 }
