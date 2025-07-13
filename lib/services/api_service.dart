@@ -1,16 +1,11 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  // Use platform-specific URL for Android emulator vs iOS simulator
+  // Production server URL deployed on Railway
   static String get baseUrl {
-    if (Platform.isAndroid) {
-      return 'http://10.0.2.2:3000/api'; // Android emulator maps to host localhost
-    } else {
-      return 'http://localhost:3000/api'; // iOS simulator and other platforms
-    }
+    return 'https://gameboyappbackend-production.up.railway.app/api';
   }
 
   // Get stored token with enhanced logging
