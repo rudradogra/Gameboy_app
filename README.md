@@ -8,7 +8,7 @@
 
 *Step into the past with the future of dating - A fully functional GameBoy-themed dating app with an authentic retro experience*
 
-[🎥 Demo Video](https://github.com/your-repo/demo) | [📱 Download APK](https://github.com/your-repo/releases)
+[🎥 Demo Video](https://youtube.com/shorts/_ZogtFTygEc) | [📱 Download APK]([https://github.com/your-repo/releases](https://drive.google.com/file/d/1NZY6sp396ejUND6L2rexybx5yUfknHjc/view?usp=sharing))
 
 </div>
 
