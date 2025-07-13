@@ -16,68 +16,54 @@ class ImageProcessor {
     }
   }
 
-  async convertToGameBoyStyle(inputPath, outputFilename) {
+  async convertToRetro8Bit(inputPath, outputFilename, size = 200) {
     await this.ensureDirectoryExists(this.outputDir);
     
     const outputPath = path.join(this.outputDir, outputFilename);
     
     try {
-      // GameBoy-style processing: resize, pixelate, and apply GameBoy color palette
-      await sharp(inputPath)
-        .resize(160, 144, { 
+      // Create authentic 8-bit retro effect with enhanced pixelation and vibrant colors
+      const pipeline = sharp(inputPath)
+        .resize(size, size, { 
           fit: 'cover',
           position: 'center'
+        });
+
+      // Apply color enhancement and pixelation
+      await pipeline
+        // Enhance saturation for more vibrant RGB colors
+        .modulate({
+          saturation: 1.8, // Boost saturation for vivid retro colors
+          brightness: 1.1  // Slight brightness increase
         })
-        // Convert to grayscale first for authentic GameBoy feel
-        .grayscale()
-        // Reduce to 4 colors (GameBoy had 4 shades of green)
+        // Create heavy pixelation effect
+        .resize(16, 16, { kernel: 'nearest' }) // Very small for chunky pixels
+        .resize(size, size, { kernel: 'nearest' }) // Scale back up maintaining pixel blocks
+        // Apply limited color palette for authentic retro look
         .png({
           palette: true,
-          colors: 4,
-          dither: 1.0
+          colors: 32, // Increased from 16 for better color variety but still retro
+          dither: 0.3, // Reduced dither for cleaner pixel blocks
+          compressionLevel: 0 // No compression to maintain sharp pixels
         })
-        // Apply pixelated effect by scaling down and back up
-        .resize(80, 72, { kernel: 'nearest' })
-        .resize(160, 144, { kernel: 'nearest' })
         .toFile(outputPath);
 
-      console.log(`✅ Image processed successfully: ${outputFilename}`);
+      console.log(`✅ 8-bit retro image processed successfully: ${outputFilename}`);
       return outputPath;
     } catch (error) {
-      console.error('❌ Error processing image:', error);
-      throw new Error(`Image processing failed: ${error.message}`);
+      console.error('❌ Error processing 8-bit retro image:', error);
+      throw new Error(`8-bit retro processing failed: ${error.message}`);
     }
   }
 
-  async convertToRetroPixelated(inputPath, outputFilename) {
-    await this.ensureDirectoryExists(this.outputDir);
-    
-    const outputPath = path.join(this.outputDir, outputFilename);
-    
-    try {
-      // Create retro pixelated effect with limited color palette
-      await sharp(inputPath)
-        .resize(200, 200, { 
-          fit: 'cover',
-          position: 'center'
-        })
-        // First, reduce colors to create that retro look
-        .png({
-          palette: true,
-          colors: 16, // Limited color palette
-          dither: 0.5
-        })
-        // Create pixelated effect
-        .resize(50, 50, { kernel: 'nearest' }) // Scale down with nearest neighbor
-        .resize(200, 200, { kernel: 'nearest' }) // Scale back up to maintain pixels
-        .toFile(outputPath);
+  async convertToGameBoyStyle(inputPath, outputFilename) {
+    // Use the same 8-bit processing for consistency
+    return this.convertToRetro8Bit(inputPath, outputFilename, 160);
+  }
 
-      console.log(`✅ Retro image processed successfully: ${outputFilename}`);
-      return outputPath;
-    } catch (error) {
-      console.error('❌ Error processing retro image:', error);
-      throw new Error(`Retro image processing failed: ${error.message}`);
-    }
+  async convertToRetroPixelated(inputPath, outputFilename) {
+    // Use the same 8-bit processing for consistency
+    return this.convertToRetro8Bit(inputPath, outputFilename, 200);
   }
 
   async deleteFile(filePath) {

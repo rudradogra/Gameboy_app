@@ -249,63 +249,178 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void _showImagePicker(int imageIndex) async {
     if (_isUploadingImage) return;
 
+    // Get current image URL if available (prioritize preview URL if available)
+    String? currentImageUrl;
+    if (_previewUrls[imageIndex] != null &&
+        _previewUrls[imageIndex]!.isNotEmpty) {
+      currentImageUrl = _previewUrls[imageIndex];
+    } else if (imageIndex < _imageUrls.length &&
+        _imageUrls[imageIndex].isNotEmpty) {
+      currentImageUrl = _imageUrls[imageIndex];
+    }
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF8B0000),
         title: Text(
-          'Add Image ${imageIndex + 1}',
+          'Image ${imageIndex + 1}',
           style: const TextStyle(
             color: Colors.white,
             fontFamily: 'PublicPixel',
+            fontSize: 12,
           ),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Choose how to add your image:',
-              style: const TextStyle(
-                color: Colors.white70,
-                fontFamily: 'PublicPixel',
-                fontSize: 10,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _pickImage(imageIndex, ImageSource.camera);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.cyanAccent,
-                    foregroundColor: Colors.black,
-                  ),
-                  child: const Text(
-                    'CAMERA',
-                    style: TextStyle(fontFamily: 'PublicPixel', fontSize: 8),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Image preview section (if image exists)
+              if (currentImageUrl != null) ...[
+                Text(
+                  'Current Image:',
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontFamily: 'PublicPixel',
+                    fontSize: 8,
                   ),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _pickImage(imageIndex, ImageSource.gallery);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.cyanAccent,
-                    foregroundColor: Colors.black,
+                const SizedBox(height: 8),
+                Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.cyanAccent, width: 2),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Text(
-                    'GALLERY',
-                    style: TextStyle(fontFamily: 'PublicPixel', fontSize: 8),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: ColorFiltered(
+                      colorFilter: ColorFilter.matrix([
+                        1.2, 0.0, 0.0, 0.0, 0.0, // Red channel boost
+                        0.0, 1.1, 0.0, 0.0, 0.0, // Green channel boost
+                        0.0, 0.0, 1.3, 0.0, 0.0, // Blue channel boost
+                        0.0, 0.0, 0.0, 1.0, 0.0, // Alpha channel
+                      ]),
+                      child: Image.network(
+                        currentImageUrl,
+                        fit: BoxFit.cover,
+                        filterQuality: FilterQuality.none, // Pixelated display
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            color: Colors.grey[800],
+                            child: Center(
+                              child: Text(
+                                'Loading...',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontFamily: 'PublicPixel',
+                                  fontSize: 6,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.grey[800],
+                            child: Icon(Icons.error, color: Colors.red, size: 24),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+
+              // Action text
+              Text(
+                currentImageUrl != null
+                    ? 'Replace image or cancel:'
+                    : 'Choose how to add image:',
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontFamily: 'PublicPixel',
+                  fontSize: 9,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+
+              // Camera/Gallery buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _pickImage(imageIndex, ImageSource.camera);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.cyanAccent,
+                        foregroundColor: Colors.black,
+                        padding: EdgeInsets.symmetric(vertical: 8),
+                      ),
+                      child: const Text(
+                        'CAMERA',
+                        style: TextStyle(
+                          fontFamily: 'PublicPixel',
+                          fontSize: 7,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _pickImage(imageIndex, ImageSource.gallery);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.cyanAccent,
+                        foregroundColor: Colors.black,
+                        padding: EdgeInsets.symmetric(vertical: 8),
+                      ),
+                      child: const Text(
+                        'GALLERY',
+                        style: TextStyle(
+                          fontFamily: 'PublicPixel',
+                          fontSize: 7,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              // Remove button (if image exists)
+              if (currentImageUrl != null) ...[
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _removeImage(imageIndex);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                    ),
+                    child: const Text(
+                      'REMOVE IMAGE',
+                      style: TextStyle(fontFamily: 'PublicPixel', fontSize: 7),
+                    ),
                   ),
                 ),
               ],
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -315,6 +430,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               style: TextStyle(
                 color: Colors.white70,
                 fontFamily: 'PublicPixel',
+                fontSize: 10,
               ),
             ),
           ),
@@ -972,11 +1088,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(2),
-                child: Image.network(
-                  _previewUrls[index]!,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      Icon(Icons.error, size: 12, color: Colors.red),
+                child: ColorFiltered(
+                  colorFilter: ColorFilter.matrix([
+                    1.2, 0.0, 0.0, 0.0, 0.0, // Red channel boost
+                    0.0, 1.1, 0.0, 0.0, 0.0, // Green channel boost
+                    0.0, 0.0, 1.3, 0.0, 0.0, // Blue channel boost
+                    0.0, 0.0, 0.0, 1.0, 0.0, // Alpha channel
+                  ]),
+                  child: Image.network(
+                    _previewUrls[index]!,
+                    fit: BoxFit.cover,
+                    filterQuality: FilterQuality.none, // Pixelated display
+                    errorBuilder: (context, error, stackTrace) =>
+                        Icon(Icons.error, size: 12, color: Colors.red),
+                  ),
                 ),
               ),
             ),

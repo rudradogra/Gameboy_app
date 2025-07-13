@@ -75,12 +75,21 @@ class GameboyProfileCardState extends State<GameboyProfileCard>
         // Background Image
         ClipRRect(
           borderRadius: BorderRadius.circular(12),
-          child: Image.network(
-            widget.imageUrl[widget.currentImageIndex],
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => Container(
-              color: Colors.grey[300],
-              child: Icon(Icons.person, color: Colors.grey[600], size: 60),
+          child: ColorFiltered(
+            colorFilter: ColorFilter.matrix([
+              1.2, 0.0, 0.0, 0.0, 0.0, // Red channel boost
+              0.0, 1.1, 0.0, 0.0, 0.0, // Green channel boost
+              0.0, 0.0, 1.3, 0.0, 0.0, // Blue channel boost
+              0.0, 0.0, 0.0, 1.0, 0.0, // Alpha channel
+            ]),
+            child: Image.network(
+              widget.imageUrl[widget.currentImageIndex],
+              fit: BoxFit.cover,
+              filterQuality: FilterQuality.none, // Pixelated display for retro look
+              errorBuilder: (context, error, stackTrace) => Container(
+                color: Colors.grey[300],
+                child: Icon(Icons.person, color: Colors.grey[600], size: 60),
+              ),
             ),
           ),
         ),
